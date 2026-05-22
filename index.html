@@ -143,7 +143,7 @@
         }
         .chat-textarea {
             width: 100%;
-            height: 270px;
+            height: 260px;
             border: 1px solid var(--border-color);
             border-radius: 8px;
             padding: 15px;
@@ -197,12 +197,12 @@
     
     <div class="settings-panel">
         <div class="input-group">
-            <label>Valor Bruto na Tela (R$)</label>
+            <label>Valor de Venda do Produto (R$)</label>
             <input type="number" id="vendaBruta" value="1198.98" step="0.01">
         </div>
         <div class="input-group">
             <label>Nº de Parcelas Selecionado</label>
-            <input type="number" id="numParcelas" value="1" min="1" max="12">
+            <input type="number" id="numParcelas" value="6" min="1" max="12">
         </div>
         <div class="input-group">
             <label>Modelo das Parcelas</label>
@@ -219,8 +219,8 @@
         <div class="input-group">
             <label>Repassar Juros Pro Cliente?</label>
             <select id="repassarJuros">
-                <option value="sim" selected>Sim (Cliente paga os juros no checkout)</option>
-                <option value="nao">Não (Absorver tudo na margem)</option>
+                <option value="sim">Sim (Cliente paga os juros no checkout)</option>
+                <option value="nao" selected>Não (Absorver tudo na margem)</option>
                 <option value="parcial">Absorção Parcial (Até Parcela X)</option>
             </select>
         </div>
@@ -293,13 +293,13 @@
         <div class="report-header">
             <div class="report-header-info">
                 <h2>Análise Estratégica de Margem</h2>
-                <p>Fluxo líquido de faturamento desconsiderando taxas repassadas ao checkout</p>
+                <p>Fluxo líquido detalhado considerando custos de parcelamento e taxas</p>
             </div>
             <div class="appmax-logo-text" style="color: white; font-size: 20px;"><span>app</span>max</div>
         </div>
 
         <div class="rules-summary">
-            <span>Valor Base do Pedido: <span id="lCheckout">R$ 0,00</span></span>
+            <span>Valor Produto: <span id="lCheckout">R$ 0,00</span></span>
             <span>Parcelas: <span id="lParcelas">0</span>x</span>
             <span>Garantia Retida: <span id="lGarantiaTxt">R$ 0,00</span></span>
             <span>Tarifa Saque: <span id="lSaqueTxt">R$ 0,00</span></span>
@@ -316,7 +316,7 @@
                 </thead>
                 <tbody>
                     <tr>
-                        <td><b>Valor Bruto Inicial</b></td>
+                        <td><b>Valor Bruto da Venda (com Juros se aplicável)</b></td>
                         <td class="text-right" id="vBruto30">R$ 0,00</td>
                         <td class="text-right" id="vBrutoAnt">R$ 0,00</td>
                     </tr>
@@ -331,7 +331,7 @@
                         <td class="text-right" id="vGateAnt">- R$ 0,00</td>
                     </tr>
                     <tr>
-                        <td>Taxa de Parcelamento (Apenas Parte Absorvida)</td>
+                        <td>Custo de Parcelamento (Taxa Calculada)</td>
                         <td class="text-right" id="vParc30">- R$ 0,00</td>
                         <td class="text-right" id="vParcAnt">- R$ 0,00</td>
                     </tr>
@@ -341,7 +341,7 @@
                         <td class="text-right" id="vLiqAnt">R$ 0,00</td>
                     </tr>
                     <tr>
-                        <td>Retenção de Garantia (sobre o Base)</td>
+                        <td>Retenção de Garantia (sobre o Líquido Inicial)</td>
                         <td class="text-right" id="vGar30">- R$ 0,00</td>
                         <td class="text-right" id="vGarAnt">- R$ 0,00</td>
                     </tr>
@@ -365,7 +365,7 @@
         </div>
 
         <div class="footer-note">
-            <b>Nota de Auditoria Interna:</b> Juros cobrados diretamente do consumidor no checkout não integram o fluxo de receitas do lojista. O custo total para antecipação imediata deste saldo é de <span id="vDiferenca" style="font-weight: 700; color: var(--appmax-purple);">R$ 0,00</span>.
+            <b>Nota de Auditoria Interna:</b> Simulação operacional para controle de margem. O custo total para antecipação imediata deste saldo é de <span id="vDiferenca" style="font-weight: 700; color: var(--appmax-purple);">R$ 0,00</span>.
         </div>
     </div>
 </div>
@@ -375,25 +375,17 @@
     
     function format(v) { return v.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }); }
 
-    document.getElementById('modeloCalculo').addEventListener('change', function() {
-        const isCustom = this.value === 'custom';
-        document.getElementById('matrixPanel').style.display = isCustom ? 'block' : 'none';
-        document.getElementById('groupTaxaLinear').style.display = isCustom ? 'none' : 'flex';
-        update();
-    });
-
-    document.getElementById('repassarJuros').addEventListener('change', function() {
-        document.getElementById('groupAbsorcao').style.display = (this.value === 'parcial') ? 'flex' : 'none';
-        update();
-    });
-
-    document.getElementById('statusSaque').addEventListener('change', function() {
-        document.getElementById('groupValorSaque').style.display = (this.value === 'cobrar') ? 'flex' : 'none';
-        update();
+    // Correção dos escutadores usando eventos combinados ('input' e 'change')
+    baseFields.forEach(f => {
+        const el = document.getElementById(f);
+        el.addEventListener('input', update);
+        el.addEventListener('change', update);
     });
 
     for(let i=1; i<=12; i++) {
-        document.getElementById(`m${i}`).addEventListener('input', update);
+        const el = document.getElementById(`m${i}`);
+        el.addEventListener('input', update);
+        el.addEventListener('change', update);
     }
 
     function update() {
@@ -403,22 +395,34 @@
             val[f] = el.type === 'number' ? (parseFloat(el.value) || 0) : el.value;
         });
 
-        const valorSaqueFinal = val.statusSaque === 'isento' ? 0 : val.taxaSaque;
-        let jurosTotalPedido = 0;
-        let pAlvo = Math.min(12, Math.max(1, val.numParcelas));
+        // Toggle de visualização dos blocos condicionais
+        document.getElementById('matrixPanel').style.display = val.modeloCalculo === 'custom' ? 'block' : 'none';
+        document.getElementById('groupTaxaLinear').style.display = val.modeloCalculo === 'custom' ? 'none' : 'flex';
+        document.getElementById('groupAbsorcao').style.display = val.repassarJuros === 'parcial' ? 'flex' : 'none';
+        document.getElementById('groupValorSaque').style.display = val.statusSaque === 'cobrar' ? 'flex' : 'none';
 
+        const valorSaqueFinal = val.statusSaque === 'isento' ? 0 : val.taxaSaque;
+        let pAlvo = Math.min(12, Math.max(1, val.numParcelas));
+        let jurosTotalPercentual = 0;
+
+        // Identificação correta da taxa de juro
         if (val.modeloCalculo === 'custom') {
-            jurosTotalPedido = parseFloat(document.getElementById(`m${pAlvo}`).value) || 0;
+            jurosTotalPercentual = parseFloat(document.getElementById(`m${pAlvo}`).value) || 0;
         } else if (val.modeloCalculo === 'auto_mensal') {
-            jurosTotalPedido = pAlvo > 1 ? (val.taxaParc * pAlvo) : 0;
+            jurosTotalPercentual = pAlvo > 1 ? (val.taxaParc * pAlvo) : 0;
         } else {
-            jurosTotalPedido = pAlvo > 1 ? val.taxaParc : 0;
+            jurosTotalPercentual = pAlvo > 1 ? val.taxaParc : 0;
         }
 
+        let taxaJuroCliente = 0;
         let taxaJuroAbsorvida = 0;
 
-        if (val.repassarJuros === 'nao') {
-            taxaJuroAbsorvida = jurosTotalPedido;
+        if (val.repassarJuros === 'sim') {
+            taxaJuroCliente = jurosTotalPercentual;
+            taxaJuroAbsorvida = 0;
+        } else if (val.repassarJuros === 'nao') {
+            taxaJuroCliente = 0;
+            taxaJuroAbsorvida = jurosTotalPercentual;
         } else if (val.repassarJuros === 'parcial') {
             if (pAlvo > val.limiteAbsorcao) {
                 if (val.modeloCalculo === 'custom') {
@@ -426,38 +430,44 @@
                 } else if (val.modeloCalculo === 'auto_mensal') {
                     taxaJuroAbsorvida = val.taxaParc * val.limiteAbsorcao;
                 } else {
-                    taxaJuroAbsorvida = (jurosTotalPedido / pAlvo) * val.limiteAbsorcao;
+                    taxaJuroAbsorvida = (jurosTotalPercentual / pAlvo) * val.limiteAbsorcao;
                 }
+                taxaJuroCliente = Math.max(0, jurosTotalPercentual - taxaJuroAbsorvida);
             } else {
-                taxaJuroAbsorvida = jurosTotalPedido;
+                taxaJuroCliente = 0;
+                taxaJuroAbsorvida = jurosTotalPercentual;
             }
         }
 
-        const dProc = val.vendaBruta * (val.taxaProc / 100);
+        // Base de cálculo considerando se o juro entra ou não no checkout do cliente
+        const valorCheckout = val.vendaBruta * (1 + (taxaJuroCliente / 100));
+        const dProc = valorCheckout * (val.taxaProc / 100);
         const dParcAbsorvido = val.vendaBruta * (taxaJuroAbsorvida / 100);
-        
-        const liqAppmax = val.vendaBruta - dProc - val.taxaGate - dParcAbsorvido;
-        const dGar = val.vendaBruta * (val.taxaGar / 100);
+        const custoTotalParcelamento = (valorCheckout - val.vendaBruta) + dParcAbsorvido;
+
+        const liqAppmax = valorCheckout - dProc - val.taxaGate - dParcAbsorvido;
+        const dGar = liqAppmax * (val.taxaGar / 100); // Taxa aplicada sobre o líquido da tela
         const saldoSobra = liqAppmax - dGar;
         const dAnte = saldoSobra * (val.taxaAnte / 100);
 
         const res30 = saldoSobra - valorSaqueFinal;
         const resAnt = saldoSobra - dAnte - valorSaqueFinal;
 
+        // Atualização dos elementos da Tabela e PDF
         document.getElementById('lCheckout').innerText = format(val.vendaBruta);
         document.getElementById('lParcelas').innerText = pAlvo;
         document.getElementById('lGarantiaTxt').innerText = `${format(dGar)} (${val.prazoGarantia}d)`;
         document.getElementById('lSaqueTxt').innerText = valorSaqueFinal === 0 ? 'Isento' : format(valorSaqueFinal);
-        const polTxt = val.repassarJuros === 'sim' ? 'Repasse Total (Consumidor)' : (val.repassarJuros === 'nao' ? 'Absorção Total' : `Absorve até ${val.limiteAbsorcao}x`);
+        const polTxt = val.repassarJuros === 'sim' ? 'Repasse Total' : (val.repassarJuros === 'nao' ? 'Absorção Total' : `Absorve até ${val.limiteAbsorcao}x`);
 
-        document.getElementById('vBruto30').innerText = format(val.vendaBruta);
-        document.getElementById('vBrutoAnt').innerText = format(val.vendaBruta);
+        document.getElementById('vBruto30').innerText = format(valorCheckout);
+        document.getElementById('vBrutoAnt').innerText = format(valorCheckout);
         document.getElementById('vProc30').innerText = '- ' + format(dProc);
         document.getElementById('vProcAnt').innerText = '- ' + format(dProc);
         document.getElementById('vGate30').innerText = '- ' + format(val.taxaGate);
         document.getElementById('vGateAnt').innerText = '- ' + format(val.taxaGate);
-        document.getElementById('vParc30').innerText = '- ' + format(dParcAbsorvido);
-        document.getElementById('vParcAnt').innerText = '- ' + format(dParcAbsorvido);
+        document.getElementById('vParc30').innerText = '- ' + format(custoTotalParcelamento);
+        document.getElementById('vParcAnt').innerText = '- ' + format(custoTotalParcelamento);
         document.getElementById('vLiq30').innerText = format(liqAppmax);
         document.getElementById('vLiqAnt').innerText = format(liqAppmax);
         document.getElementById('vGar30').innerText = '- ' + format(dGar);
@@ -466,16 +476,15 @@
         document.getElementById('vAnte30').innerText = format(0);
         document.getElementById('vSaque30').innerText = '- ' + format(valorSaqueFinal);
         document.getElementById('vSaqueAnt').innerText = '- ' + format(valorSaqueFinal);
-        
         document.getElementById('vFinal30').innerText = format(res30);
         document.getElementById('vFinalAnt').innerText = format(resAnt);
         document.getElementById('vDiferenca').innerText = format(res30 - resAnt);
 
-        // Atualização da caixa de texto incluindo as regras de prazo de liberação
+        // Atualização da área de texto para o chat
         document.getElementById('chatTemplateTextarea').value = 
 `Olá! Fiz o fechamento dos cálculos com base nos termos comerciais do seu plano. Segue o detalhamento simplificado:
 
-• Valor Líquido na Plataforma: ${format(val.vendaBruta)}
+• Valor do Pedido: ${format(val.vendaBruta)} (Parcelado em ${pAlvo}x)
 • Desconto da Taxa de Garantia (${val.taxaGar}%): - ${format(dGar)} (Liberado para saque em ${val.prazoGarantia} dias)
 • Saldo Restante pós-garantia: ${format(liqAppmax - dGar)}
 
@@ -494,7 +503,6 @@ Aplicando a taxa de antecipação comercial de ${val.taxaAnte}%, o valor total l
         const textarea = document.getElementById('chatTemplateTextarea');
         textarea.select();
         textarea.setSelectionRange(0, 99999);
-
         try {
             document.execCommand('copy');
             const btn = document.querySelector('.btn-chat');
@@ -506,12 +514,9 @@ Aplicando a taxa de antecipação comercial de ${val.taxaAnte}%, o valor total l
                 btn.style.background = "#10b981";
             }, 2000);
         } catch (err) {
-            alert("Selecione o texto da caixa e copie manualmente.");
+            alert("Selecione e copie manualmente.");
         }
     }
-
-    baseFields.forEach(f => document.getElementById(f).addEventListener('input', update));
-    update();
 
     function gerarPDF() {
         const element = document.getElementById('pdf-report');
