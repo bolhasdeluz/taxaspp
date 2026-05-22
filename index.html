@@ -155,7 +155,6 @@
             background: #ffffff;
             box-sizing: border-box;
         }
-        .chat-textarea:focus { outline: none; border-color: #10b981; }
 
         #pdf-report { padding: 0; background: white; border-radius: 12px; overflow: hidden; border: 1px solid var(--border-color); }
         .report-header { background-color: var(--appmax-purple); color: white; padding: 35px 30px; display: flex; justify-content: space-between; align-items: center; }
@@ -193,34 +192,34 @@
     </div>
 
     <h1>Configurador de Política de Taxas</h1>
-    <div class="subtitle">Simulação focada no repasse real de custos operacionais do lojista.</div>
+    <div class="subtitle">Simulação operacional ajustada com foco na conferência de repasses.</div>
     
     <div class="settings-panel">
         <div class="input-group">
             <label>Valor de Venda do Produto (R$)</label>
-            <input type="number" id="vendaBruta" value="1198.98" step="0.01">
+            <input type="number" id="vendaBruta" value="1277.67" step="0.01">
         </div>
         <div class="input-group">
             <label>Nº de Parcelas Selecionado</label>
-            <input type="number" id="numParcelas" value="6" min="1" max="12">
+            <input type="number" id="numParcelas" value="10" min="1" max="12">
         </div>
         <div class="input-group">
             <label>Modelo das Parcelas</label>
             <select id="modeloCalculo">
-                <option value="auto_mensal">Automático: Multiplicar ao Mês</option>
+                <option value="auto_mensal" selected>Automático: Multiplicar ao Mês</option>
                 <option value="auto_fixo">Automático: Taxa Fixa</option>
-                <option value="custom" selected>Personalizado: Tabela Mês a Mês</option>
+                <option value="custom">Personalizado: Tabela Mês a Mês</option>
             </select>
         </div>
-        <div class="input-group" id="groupTaxaLinear" style="display:none;">
+        <div class="input-group" id="groupTaxaLinear">
             <label>Taxa de Parcelamento Base (%)</label>
-            <input type="number" id="taxaParc" value="2.49" step="0.01">
+            <input type="number" id="taxaParc" value="2.19" step="0.01">
         </div>
         <div class="input-group">
             <label>Repassar Juros Pro Cliente?</label>
             <select id="repassarJuros">
-                <option value="sim">Sim (Cliente paga os juros no checkout)</option>
-                <option value="nao" selected>Não (Absorver tudo na margem)</option>
+                <option value="sim" selected>Sim (Cliente paga os juros no checkout)</option>
+                <option value="nao">Não (Absorver tudo na margem)</option>
                 <option value="parcial">Absorção Parcial (Até Parcela X)</option>
             </select>
         </div>
@@ -261,7 +260,7 @@
         </div>
     </div>
 
-    <div class="custom-matrix-panel" id="matrixPanel">
+    <div class="custom-matrix-panel" id="matrixPanel" style="display: none;">
         <div class="matrix-title">Tabela de Parcelamento Customizada (Defina a Taxa Final Acumulada para cada Mês)</div>
         <div class="matrix-grid">
             <div class="matrix-input"><label>1x (%)</label><input type="number" id="m1" value="0.00" step="0.01"></div>
@@ -273,7 +272,7 @@
             <div class="matrix-input"><label>7x (%)</label><input type="number" id="m7" value="12.20" step="0.01"></div>
             <div class="matrix-input"><label>8x (%)</label><input type="number" id="m8" value="14.00" step="0.01"></div>
             <div class="matrix-input"><label>9x (%)</label><input type="number" id="m9" value="15.80" step="0.01"></div>
-            <div class="matrix-input"><label>10x (%)</label><input type="number" id="m10" value="17.50" step="0.01"></div>
+            <div class="matrix-input"><label>10x (%)</label><input type="number" id="m10" value="21.90" step="0.01"></div>
             <div class="matrix-input"><label>11x (%)</label><input type="number" id="m11" value="19.20" step="0.01"></div>
             <div class="matrix-input"><label>12x (%)</label><input type="number" id="m12" value="21.00" step="0.01"></div>
         </div>
@@ -293,13 +292,13 @@
         <div class="report-header">
             <div class="report-header-info">
                 <h2>Análise Estratégica de Margem</h2>
-                <p>Fluxo líquido detalhado considerando custos de parcelamento e taxas</p>
+                <p>Demonstrativo de fechamento financeiro interno por pedido</p>
             </div>
             <div class="appmax-logo-text" style="color: white; font-size: 20px;"><span>app</span>max</div>
         </div>
 
         <div class="rules-summary">
-            <span>Valor Produto: <span id="lCheckout">R$ 0,00</span></span>
+            <span>Valor Líquido Original: <span id="lCheckout">R$ 0,00</span></span>
             <span>Parcelas: <span id="lParcelas">0</span>x</span>
             <span>Garantia Retida: <span id="lGarantiaTxt">R$ 0,00</span></span>
             <span>Tarifa Saque: <span id="lSaqueTxt">R$ 0,00</span></span>
@@ -309,19 +308,24 @@
             <table>
                 <thead>
                     <tr>
-                        <th>Fluxo de Entrada e Descontos Reais</th>
+                        <th>Fluxo de Lançamento / Auditoria</th>
                         <th class="text-right">Recebimento 30 Dias</th>
                         <th class="text-right">Recebimento Antecipado</th>
                     </tr>
                 </thead>
                 <tbody>
                     <tr>
-                        <td><b>Valor Bruto da Venda (com Juros se aplicável)</b></td>
+                        <td><b>Valor Base da Venda</b></td>
                         <td class="text-right" id="vBruto30">R$ 0,00</td>
                         <td class="text-right" id="vBrutoAnt">R$ 0,00</td>
                     </tr>
                     <tr>
-                        <td>Taxa de Processamento Appmax Base</td>
+                        <td>Custo do Parcelamento (Juros Globais)</td>
+                        <td class="text-right" id="vParc30">R$ 0,00</td>
+                        <td class="text-right" id="vParcAnt">R$ 0,00</td>
+                    </tr>
+                    <tr>
+                        <td>Taxa de Processamento Comercial Appmax</td>
                         <td class="text-right" id="vProc30">- R$ 0,00</td>
                         <td class="text-right" id="vProcAnt">- R$ 0,00</td>
                     </tr>
@@ -330,18 +334,13 @@
                         <td class="text-right" id="vGate30">- R$ 0,00</td>
                         <td class="text-right" id="vGateAnt">- R$ 0,00</td>
                     </tr>
-                    <tr>
-                        <td>Custo de Parcelamento (Taxa Calculada)</td>
-                        <td class="text-right" id="vParc30">- R$ 0,00</td>
-                        <td class="text-right" id="vParcAnt">- R$ 0,00</td>
-                    </tr>
                     <tr class="row-highlight">
-                        <td><b>Saldo Líquido da Plataforma</b></td>
+                        <td><b>Total Disponibilizado na Tela (Líquido Inicial)</b></td>
                         <td class="text-right" id="vLiq30">R$ 0,00</td>
                         <td class="text-right" id="vLiqAnt">R$ 0,00</td>
                     </tr>
                     <tr>
-                        <td>Retenção de Garantia (sobre o Líquido Inicial)</td>
+                        <td>Retenção da Taxa de Garantia</td>
                         <td class="text-right" id="vGar30">- R$ 0,00</td>
                         <td class="text-right" id="vGarAnt">- R$ 0,00</td>
                     </tr>
@@ -356,7 +355,7 @@
                         <td class="text-right" id="vSaqueAnt">- R$ 0,00</td>
                     </tr>
                     <tr class="total-row">
-                        <td>VALOR LÍQUIDO FINAL NA CONTA</td>
+                        <td>VALOR REAL TOTAL A RECEBER NA CONTA</td>
                         <td class="text-right" id="vFinal30">R$ 0,00</td>
                         <td class="text-right" id="vFinalAnt">R$ 0,00</td>
                     </tr>
@@ -365,7 +364,7 @@
         </div>
 
         <div class="footer-note">
-            <b>Nota de Auditoria Interna:</b> Simulação operacional para controle de margem. O custo total para antecipação imediata deste saldo é de <span id="vDiferenca" style="font-weight: 700; color: var(--appmax-purple);">R$ 0,00</span>.
+            <b>Nota:</b> Quando o juro é repassado, ele entra somando no checkout e sai abatido integralmente no repasse da operadora, neutralizando o custo para o lojista. Diferença de antecipação imediata: <span id="vDiferenca" style="font-weight: 700; color: var(--appmax-purple);">R$ 0,00</span>.
         </div>
     </div>
 </div>
@@ -375,7 +374,6 @@
     
     function format(v) { return v.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }); }
 
-    // Correção dos escutadores usando eventos combinados ('input' e 'change')
     baseFields.forEach(f => {
         const el = document.getElementById(f);
         el.addEventListener('input', update);
@@ -395,7 +393,6 @@
             val[f] = el.type === 'number' ? (parseFloat(el.value) || 0) : el.value;
         });
 
-        // Toggle de visualização dos blocos condicionais
         document.getElementById('matrixPanel').style.display = val.modeloCalculo === 'custom' ? 'block' : 'none';
         document.getElementById('groupTaxaLinear').style.display = val.modeloCalculo === 'custom' ? 'none' : 'flex';
         document.getElementById('groupAbsorcao').style.display = val.repassarJuros === 'parcial' ? 'flex' : 'none';
@@ -405,7 +402,6 @@
         let pAlvo = Math.min(12, Math.max(1, val.numParcelas));
         let jurosTotalPercentual = 0;
 
-        // Identificação correta da taxa de juro
         if (val.modeloCalculo === 'custom') {
             jurosTotalPercentual = parseFloat(document.getElementById(`m${pAlvo}`).value) || 0;
         } else if (val.modeloCalculo === 'auto_mensal') {
@@ -439,54 +435,66 @@
             }
         }
 
-        // Base de cálculo considerando se o juro entra ou não no checkout do cliente
-        const valorCheckout = val.vendaBruta * (1 + (taxaJuroCliente / 100));
-        const dProc = valorCheckout * (val.taxaProc / 100);
+        // CÁLCULO SEGUINDO A ESTEIRA EXATA DA APPMAX:
+        const dParcCliente = val.vendaBruta * (taxaJuroCliente / 100);
+        const valorCheckoutFinal = val.vendaBruta + dParcCliente; // O que o cliente pagou na maquininha/checkout
+        
+        const dProc = valorCheckoutFinal * (val.taxaProc / 100); // 4.99% morde o checkout total inflado
         const dParcAbsorvido = val.vendaBruta * (taxaJuroAbsorvida / 100);
-        const custoTotalParcelamento = (valorCheckout - val.vendaBruta) + dParcAbsorvido;
 
-        const liqAppmax = valorCheckout - dProc - val.taxaGate - dParcAbsorvido;
-        const dGar = liqAppmax * (val.taxaGar / 100); // Taxa aplicada sobre o líquido da tela
-        const saldoSobra = liqAppmax - dGar;
+        // O total líquido inicial que aparece na tela do cliente pós taxa base
+        const liqAppmaxMesa = valorCheckoutFinal - dProc - val.taxaGate - dParcCliente; 
+        
+        // Descontos da sua esteira interna sobre o líquido da tela
+        const dGar = liqAppmaxMesa * (val.taxaGar / 100);
+        const saldoSobra = liqAppmaxMesa - dGar;
         const dAnte = saldoSobra * (val.taxaAnte / 100);
 
         const res30 = saldoSobra - valorSaqueFinal;
         const resAnt = saldoSobra - dAnte - valorSaqueFinal;
 
-        // Atualização dos elementos da Tabela e PDF
-        document.getElementById('lCheckout').innerText = format(val.vendaBruta);
+        // Atualização dos Labels no Topo
+        document.getElementById('lCheckout').innerText = format(liqAppmaxMesa);
         document.getElementById('lParcelas').innerText = pAlvo;
         document.getElementById('lGarantiaTxt').innerText = `${format(dGar)} (${val.prazoGarantia}d)`;
         document.getElementById('lSaqueTxt').innerText = valorSaqueFinal === 0 ? 'Isento' : format(valorSaqueFinal);
-        const polTxt = val.repassarJuros === 'sim' ? 'Repasse Total' : (val.repassarJuros === 'nao' ? 'Absorção Total' : `Absorve até ${val.limiteAbsorcao}x`);
 
-        document.getElementById('vBruto30').innerText = format(valorCheckout);
-        document.getElementById('vBrutoAnt').innerText = format(valorCheckout);
+        // Preenchimento da Tabela Dinâmica
+        document.getElementById('vBruto30').innerText = format(val.vendaBruta);
+        document.getElementById('vBrutoAnt').innerText = format(val.vendaBruta);
+        
+        document.getElementById('vParc30').innerText = '+ ' + format(dParcCliente);
+        document.getElementById('vParcAnt').innerText = '+ ' + format(dParcCliente);
+        
         document.getElementById('vProc30').innerText = '- ' + format(dProc);
         document.getElementById('vProcAnt').innerText = '- ' + format(dProc);
+        
         document.getElementById('vGate30').innerText = '- ' + format(val.taxaGate);
         document.getElementById('vGateAnt').innerText = '- ' + format(val.taxaGate);
-        document.getElementById('vParc30').innerText = '- ' + format(custoTotalParcelamento);
-        document.getElementById('vParcAnt').innerText = '- ' + format(custoTotalParcelamento);
-        document.getElementById('vLiq30').innerText = format(liqAppmax);
-        document.getElementById('vLiqAnt').innerText = format(liqAppmax);
+        
+        document.getElementById('vLiq30').innerText = format(liqAppmaxMesa);
+        document.getElementById('vLiqAnt').innerText = format(liqAppmaxMesa);
+        
         document.getElementById('vGar30').innerText = '- ' + format(dGar);
         document.getElementById('vGarAnt').innerText = '- ' + format(dGar);
+        
         document.getElementById('vAnteAnt').innerText = '- ' + format(dAnte);
         document.getElementById('vAnte30').innerText = format(0);
+        
         document.getElementById('vSaque30').innerText = '- ' + format(valorSaqueFinal);
         document.getElementById('vSaqueAnt').innerText = '- ' + format(valorSaqueFinal);
+        
         document.getElementById('vFinal30').innerText = format(res30);
         document.getElementById('vFinalAnt').innerText = format(resAnt);
         document.getElementById('vDiferenca').innerText = format(res30 - resAnt);
 
-        // Atualização da área de texto para o chat
+        // Atualização do texto enxuto para o chat
         document.getElementById('chatTemplateTextarea').value = 
 `Olá! Fiz o fechamento dos cálculos com base nos termos comerciais do seu plano. Segue o detalhamento simplificado:
 
-• Valor do Pedido: ${format(val.vendaBruta)} (Parcelado em ${pAlvo}x)
+• Total Líquido na Tela: ${format(liqAppmaxMesa)}
 • Desconto da Taxa de Garantia (${val.taxaGar}%): - ${format(dGar)} (Liberado para saque em ${val.prazoGarantia} dias)
-• Saldo Restante pós-garantia: ${format(liqAppmax - dGar)}
+• Saldo Restante pós-garantia: ${format(liqAppmaxMesa - dGar)}
 
 A partir disso, você tem duas opções de recebimento:
 
