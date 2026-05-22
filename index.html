@@ -143,7 +143,7 @@
         }
         .chat-textarea {
             width: 100%;
-            height: 250px;
+            height: 270px;
             border: 1px solid var(--border-color);
             border-radius: 8px;
             padding: 15px;
@@ -155,10 +155,7 @@
             background: #ffffff;
             box-sizing: border-box;
         }
-        .chat-textarea:focus {
-            outline: none;
-            border-color: #10b981;
-        }
+        .chat-textarea:focus { outline: none; border-color: #10b981; }
 
         #pdf-report { padding: 0; background: white; border-radius: 12px; overflow: hidden; border: 1px solid var(--border-color); }
         .report-header { background-color: var(--appmax-purple); color: white; padding: 35px 30px; display: flex; justify-content: space-between; align-items: center; }
@@ -233,15 +230,19 @@
         </div>
         <div class="input-group">
             <label>Taxa Appmax Base (%)</label>
-            <input type="number" id="taxaProc" value="0.00" step="0.01">
+            <input type="number" id="taxaProc" value="4.99" step="0.01">
         </div>
         <div class="input-group">
             <label>Gateway Fixo (R$)</label>
-            <input type="number" id="taxaGate" value="0.00" step="0.01">
+            <input type="number" id="taxaGate" value="0.99" step="0.01">
         </div>
         <div class="input-group">
             <label>Garantia Base (%)</label>
             <input type="number" id="taxaGar" value="15.00" step="0.01">
+        </div>
+        <div class="input-group">
+            <label>Liberação da Garantia (Dias)</label>
+            <input type="number" id="prazoGarantia" value="30" min="0">
         </div>
         <div class="input-group">
             <label>Antecipação (%)</label>
@@ -288,12 +289,89 @@
         <textarea id="chatTemplateTextarea" class="chat-textarea"></textarea>
     </div>
 
-    <div id="pdf-report" style="display:none;">
+    <div id="pdf-report">
+        <div class="report-header">
+            <div class="report-header-info">
+                <h2>Análise Estratégica de Margem</h2>
+                <p>Fluxo líquido de faturamento desconsiderando taxas repassadas ao checkout</p>
+            </div>
+            <div class="appmax-logo-text" style="color: white; font-size: 20px;"><span>app</span>max</div>
         </div>
+
+        <div class="rules-summary">
+            <span>Valor Base do Pedido: <span id="lCheckout">R$ 0,00</span></span>
+            <span>Parcelas: <span id="lParcelas">0</span>x</span>
+            <span>Garantia Retida: <span id="lGarantiaTxt">R$ 0,00</span></span>
+            <span>Tarifa Saque: <span id="lSaqueTxt">R$ 0,00</span></span>
+        </div>
+
+        <div class="table-section">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Fluxo de Entrada e Descontos Reais</th>
+                        <th class="text-right">Recebimento 30 Dias</th>
+                        <th class="text-right">Recebimento Antecipado</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><b>Valor Bruto Inicial</b></td>
+                        <td class="text-right" id="vBruto30">R$ 0,00</td>
+                        <td class="text-right" id="vBrutoAnt">R$ 0,00</td>
+                    </tr>
+                    <tr>
+                        <td>Taxa de Processamento Appmax Base</td>
+                        <td class="text-right" id="vProc30">- R$ 0,00</td>
+                        <td class="text-right" id="vProcAnt">- R$ 0,00</td>
+                    </tr>
+                    <tr>
+                        <td>Taxa Fixa de Gateway / Antifraude</td>
+                        <td class="text-right" id="vGate30">- R$ 0,00</td>
+                        <td class="text-right" id="vGateAnt">- R$ 0,00</td>
+                    </tr>
+                    <tr>
+                        <td>Taxa de Parcelamento (Apenas Parte Absorvida)</td>
+                        <td class="text-right" id="vParc30">- R$ 0,00</td>
+                        <td class="text-right" id="vParcAnt">- R$ 0,00</td>
+                    </tr>
+                    <tr class="row-highlight">
+                        <td><b>Saldo Líquido da Plataforma</b></td>
+                        <td class="text-right" id="vLiq30">R$ 0,00</td>
+                        <td class="text-right" id="vLiqAnt">R$ 0,00</td>
+                    </tr>
+                    <tr>
+                        <td>Retenção de Garantia (sobre o Base)</td>
+                        <td class="text-right" id="vGar30">- R$ 0,00</td>
+                        <td class="text-right" id="vGarAnt">- R$ 0,00</td>
+                    </tr>
+                    <tr>
+                        <td>Desconto de Antecipação Comercial</td>
+                        <td class="text-right" id="vAnte30">R$ 0,00</td>
+                        <td class="text-right" id="vAnteAnt">- R$ 0,00</td>
+                    </tr>
+                    <tr>
+                        <td>Tarifa de Saque / Transferência</td>
+                        <td class="text-right" id="vSaque30">- R$ 0,00</td>
+                        <td class="text-right" id="vSaqueAnt">- R$ 0,00</td>
+                    </tr>
+                    <tr class="total-row">
+                        <td>VALOR LÍQUIDO FINAL NA CONTA</td>
+                        <td class="text-right" id="vFinal30">R$ 0,00</td>
+                        <td class="text-right" id="vFinalAnt">R$ 0,00</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="footer-note">
+            <b>Nota de Auditoria Interna:</b> Juros cobrados diretamente do consumidor no checkout não integram o fluxo de receitas do lojista. O custo total para antecipação imediata deste saldo é de <span id="vDiferenca" style="font-weight: 700; color: var(--appmax-purple);">R$ 0,00</span>.
+        </div>
+    </div>
 </div>
 
 <script>
-    const baseFields = ['vendaBruta', 'numParcelas', 'modeloCalculo', 'taxaParc', 'repassarJuros', 'limiteAbsorcao', 'taxaProc', 'taxaGate', 'taxaGar', 'taxaAnte', 'statusSaque', 'taxaSaque'];
+    const baseFields = ['vendaBruta', 'numParcelas', 'modeloCalculo', 'taxaParc', 'repassarJuros', 'limiteAbsorcao', 'taxaProc', 'taxaGate', 'taxaGar', 'prazoGarantia', 'taxaAnte', 'statusSaque', 'taxaSaque'];
     
     function format(v) { return v.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }); }
 
@@ -366,12 +444,39 @@
         const res30 = saldoSobra - valorSaqueFinal;
         const resAnt = saldoSobra - dAnte - valorSaqueFinal;
 
-        // Montagem do texto enxuto e didático direto na caixa editável
+        document.getElementById('lCheckout').innerText = format(val.vendaBruta);
+        document.getElementById('lParcelas').innerText = pAlvo;
+        document.getElementById('lGarantiaTxt').innerText = `${format(dGar)} (${val.prazoGarantia}d)`;
+        document.getElementById('lSaqueTxt').innerText = valorSaqueFinal === 0 ? 'Isento' : format(valorSaqueFinal);
+        const polTxt = val.repassarJuros === 'sim' ? 'Repasse Total (Consumidor)' : (val.repassarJuros === 'nao' ? 'Absorção Total' : `Absorve até ${val.limiteAbsorcao}x`);
+
+        document.getElementById('vBruto30').innerText = format(val.vendaBruta);
+        document.getElementById('vBrutoAnt').innerText = format(val.vendaBruta);
+        document.getElementById('vProc30').innerText = '- ' + format(dProc);
+        document.getElementById('vProcAnt').innerText = '- ' + format(dProc);
+        document.getElementById('vGate30').innerText = '- ' + format(val.taxaGate);
+        document.getElementById('vGateAnt').innerText = '- ' + format(val.taxaGate);
+        document.getElementById('vParc30').innerText = '- ' + format(dParcAbsorvido);
+        document.getElementById('vParcAnt').innerText = '- ' + format(dParcAbsorvido);
+        document.getElementById('vLiq30').innerText = format(liqAppmax);
+        document.getElementById('vLiqAnt').innerText = format(liqAppmax);
+        document.getElementById('vGar30').innerText = '- ' + format(dGar);
+        document.getElementById('vGarAnt').innerText = '- ' + format(dGar);
+        document.getElementById('vAnteAnt').innerText = '- ' + format(dAnte);
+        document.getElementById('vAnte30').innerText = format(0);
+        document.getElementById('vSaque30').innerText = '- ' + format(valorSaqueFinal);
+        document.getElementById('vSaqueAnt').innerText = '- ' + format(valorSaqueFinal);
+        
+        document.getElementById('vFinal30').innerText = format(res30);
+        document.getElementById('vFinalAnt').innerText = format(resAnt);
+        document.getElementById('vDiferenca').innerText = format(res30 - resAnt);
+
+        // Atualização da caixa de texto incluindo as regras de prazo de liberação
         document.getElementById('chatTemplateTextarea').value = 
 `Olá! Fiz o fechamento dos cálculos com base nos termos comerciais do seu plano. Segue o detalhamento simplificado:
 
 • Valor Líquido na Plataforma: ${format(val.vendaBruta)}
-• Desconto da Taxa de Garantia (${val.taxaGar}%): - ${format(dGar)}
+• Desconto da Taxa de Garantia (${val.taxaGar}%): - ${format(dGar)} (Liberado para saque em ${val.prazoGarantia} dias)
 • Saldo Restante pós-garantia: ${format(liqAppmax - dGar)}
 
 A partir disso, você tem duas opções de recebimento:
@@ -409,7 +514,15 @@ Aplicando a taxa de antecipação comercial de ${val.taxaAnte}%, o valor total l
     update();
 
     function gerarPDF() {
-        alert("O relatório em PDF está desativado nesta versão focada em Chat. Use o botão Copiar Texto.");
+        const element = document.getElementById('pdf-report');
+        const opt = {
+            margin: [10, 10, 10, 10],
+            filename: 'Relatorio_Precificacao_Appmax.pdf',
+            image: { type: 'jpeg', quality: 1 },
+            html2canvas: { scale: 3, useCORS: true },
+            jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+        };
+        html2pdf().set(opt).from(element).save();
     }
 </script>
 </body>
