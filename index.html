@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Simulador de Precificação Interna | Appmax</title>
+    <title>Simulador de Precificação Customizada | Appmax</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <style>
@@ -100,8 +100,14 @@
         .matrix-input label { font-size: 11px; font-weight: 600; margin-bottom: 4px; color: var(--text-muted); }
         .matrix-input input { padding: 8px 10px; border: 1px solid var(--border-color); border-radius: 6px; font-size: 13px; text-align: center; }
 
-        .btn-generate {
-            background: var(--appmax-purple);
+        /* Estrutura dos Botões Lado a Lado */
+        .actions-wrapper {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 40px;
+        }
+        .btn-action {
             color: white;
             border: none;
             padding: 16px 24px;
@@ -109,10 +115,17 @@
             font-weight: 600;
             border-radius: 8px;
             cursor: pointer;
-            width: 100%;
-            margin-bottom: 40px;
+            transition: background 0.2s, transform 0.1s;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
         }
-        .btn-generate:hover { background: #7f4dff; }
+        .btn-pdf { background: var(--appmax-purple); }
+        .btn-pdf:hover { background: #7f4dff; }
+        .btn-chat { background: #2ec4b6; }
+        .btn-chat:hover { background: #24ab9e; }
+        .btn-action:active { transform: scale(0.98); }
 
         #pdf-report { padding: 0; background: white; border-radius: 12px; overflow: hidden; border: 1px solid var(--border-color); }
         .report-header { background-color: var(--appmax-purple); color: white; padding: 35px 30px; display: flex; justify-content: space-between; align-items: center; }
@@ -232,7 +245,10 @@
         </div>
     </div>
 
-    <button class="btn-generate" onclick="gerarPDF()">Gerar Relatório de Precificação (PDF)</button>
+    <div class="actions-wrapper">
+        <button class="btn-action btn-pdf" onclick="gerarPDF()">Baixar Relatório (PDF)</button>
+        <button class="btn-action btn-chat" onclick="copiarTextoChat()">Copiar Texto para o Chat</button>
+    </div>
 
     <div id="pdf-report">
         <div class="report-header">
@@ -318,6 +334,9 @@
 <script>
     const baseFields = ['vendaBruta', 'numParcelas', 'modeloCalculo', 'taxaParc', 'repassarJuros', 'limiteAbsorcao', 'taxaProc', 'taxaGate', 'taxaGar', 'taxaAnte', 'statusSaque', 'taxaSaque'];
     
+    // Variáveis globais para armazenar os valores finais calculados para a função de copiar texto
+    let cacheTextoChat = "";
+
     function format(v) { return v.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }); }
 
     document.getElementById('modeloCalculo').addEventListener('change', function() {
@@ -378,11 +397,9 @@
             }
         }
 
-        // A Appmax desconta o processamento comercial (4.99%) sobre o valor total do produto (R$ 195,30)
         const dProc = val.vendaBruta * (val.taxaProc / 100);
         const dParcAbsorvido = val.vendaBruta * (taxaJuroAbsorvida / 100);
         
-        // Fluxo financeiro real
         const liqAppmax = val.vendaBruta - dProc - val.taxaGate - dParcAbsorvido;
         const dGar = val.vendaBruta * (val.taxaGar / 100);
         const saldoSobra = liqAppmax - dGar;
@@ -395,8 +412,8 @@
         document.getElementById('lParcelas').innerText = pAlvo;
         document.getElementById('lJurosTxt').innerText = jurosTotalPedido.toFixed(2) + '%';
         document.getElementById('lSaqueTxt').innerText = valorSaqueFinal === 0 ? 'Isento' : format(valorSaqueFinal);
-        document.getElementById('lPoliticaTxt').innerText = 
-            val.repassarJuros === 'sim' ? 'Repasse Total (Consumidor)' : (val.repassarJuros === 'nao' ? 'Absorção Total' : `Absorve até ${val.limiteAbsorcao}x`);
+        const polTxt = val.repassarJuros === 'sim' ? 'Repasse Total' : (val.repassarJuros === 'nao' ? 'Absorção Total' : `Absorve até ${val.limiteAbsorcao}x`);
+        document.getElementById('lPoliticaTxt').innerText = polTxt;
 
         document.getElementById('vBruto30').innerText = format(val.vendaBruta);
         document.getElementById('vBrutoAnt').innerText = format(val.vendaBruta);
@@ -418,6 +435,45 @@
         document.getElementById('vFinal30').innerText = format(res30);
         document.getElementById('vFinalAnt').innerText = format(resAnt);
         document.getElementById('vDiferenca').innerText = format(res30 - resAnt);
+
+        // Monta o template limpo e enxuto de texto para o chat do parceiro
+        cacheTextoChat = 
+`📊 *Simulação de Taxas Appmax*
+
+• *Valor Base (Prod + Frete):* ${format(val.vendaBruta)}
+• *Nº de Parcelas:* ${pAlvo}x (${jurosTotalPedido.toFixed(2)}% juros)
+• *Política:* ${polTxt}
+
+----------------------------------
+⏱️ *Cenário A: Recebimento em 30 Dias*
+• Saldo Líquido Plataforma: ${format(liqAppmax)}
+• Retenção Garantia (15%): - ${format(dGar)}
+➔ *Líquido Final na Conta: ${format(res30)}*
+
+----------------------------------
+⚡ *Cenário B: Recebimento Antecipado*
+• Saldo Líquido Plataforma: ${format(liqAppmax)}
+• Retenção Garantia (15%): - ${format(dGar)}
+• Taxa de Antecipação (1.49%): - ${format(dAnte)}
+➔ *Líquido Final na Conta: ${format(resAnt)}*
+
+_Custo real do adiantamento imediato: ${format(res30 - resAnt)}_`;
+    }
+
+    // Função que copia o texto enxuto para a área de transferência do usuário
+    function copiarTextoChat() {
+        navigator.clipboard.writeText(cacheTextoChat).then(() => {
+            const btn = document.querySelector('.btn-chat');
+            const originalText = btn.innerText;
+            btn.innerText = "✓ Copiado!";
+            btn.style.background = "#10b981";
+            setTimeout(() => {
+                btn.innerText = originalText;
+                btn.style.background = "#2ec4b6";
+            }, 2000);
+        }).catch(err => {
+            alert("Erro ao copiar o texto automático. Selecione manualmente.");
+        });
     }
 
     baseFields.forEach(f => document.getElementById(f).addEventListener('input', update));
