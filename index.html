@@ -52,7 +52,6 @@
         h1 { font-size: 20px; font-weight: 700; color: var(--appmax-dark); margin-bottom: 5px; }
         .subtitle { font-size: 14px; color: var(--text-muted); margin-bottom: 30px; }
 
-        /* Blocos Organizacionais do Painel */
         .section-block {
             background: #faf9ff;
             border: 1px solid var(--border-color);
@@ -153,7 +152,7 @@
         .preview-box-title { font-size: 12px; font-weight: 700; color: #4b5563; margin-bottom: 10px; text-transform: uppercase; }
         .chat-textarea {
             width: 100%;
-            height: 250px;
+            height: 255px;
             border: 1px solid var(--border-color);
             border-radius: 8px;
             padding: 15px;
@@ -209,7 +208,7 @@
         <div class="fields-grid">
             <div class="input-group">
                 <label>Valor de Venda do Produto (R$)</label>
-                <input type="number" id="vendaBruta" value="1277.67" step="0.01">
+                <input type="text" id="vendaBruta" value="1.277,67">
             </div>
             <div class="input-group">
                 <label>Nº de Parcelas Selecionado</label>
@@ -231,7 +230,7 @@
             </div>
             <div class="input-group" id="groupTaxaLinear">
                 <label>Taxa de Parcelamento Base (%)</label>
-                <input type="number" id="taxaParc" value="2.19" step="0.01">
+                <input type="text" id="taxaParc" value="2,19">
             </div>
             <div class="input-group">
                 <label>Repassar Juros Pro Cliente?</label>
@@ -253,11 +252,11 @@
         <div class="fields-grid">
             <div class="input-group">
                 <label>Taxa Appmax Base (%)</label>
-                <input type="number" id="taxaProc" value="4.99" step="0.01">
+                <input type="text" id="taxaProc" value="4,99">
             </div>
             <div class="input-group">
                 <label>Gateway Fixo (R$)</label>
-                <input type="number" id="taxaGate" value="0.99" step="0.01">
+                <input type="text" id="taxaGate" value="0,99">
             </div>
         </div>
     </div>
@@ -267,7 +266,7 @@
         <div class="fields-grid">
             <div class="input-group">
                 <label>Garantia Base (%)</label>
-                <input type="number" id="taxaGar" value="15.00" step="0.01">
+                <input type="text" id="taxaGar" value="15,00">
             </div>
             <div class="input-group">
                 <label>Liberação da Garantia (Dias)</label>
@@ -275,7 +274,7 @@
             </div>
             <div class="input-group">
                 <label>Taxa de Antecipação (%)</label>
-                <input type="number" id="taxaAnte" value="1.49" step="0.01">
+                <input type="text" id="taxaAnte" value="1,49">
             </div>
             <div class="input-group">
                 <label>Configuração de Saque</label>
@@ -286,7 +285,7 @@
             </div>
             <div class="input-group" id="groupValorSaque" style="display:none;">
                 <label>Valor da Taxa de Saque (R$)</label>
-                <input type="number" id="taxaSaque" value="3.67" step="0.01">
+                <input type="text" id="taxaSaque" value="3,67">
             </div>
         </div>
     </div>
@@ -294,18 +293,18 @@
     <div class="custom-matrix-panel" id="matrixPanel" style="display: none;">
         <div class="matrix-title">Tabela de Parcelamento Customizada (Taxa Final Acumulada por Mês)</div>
         <div class="matrix-grid">
-            <div class="matrix-input"><label>1x (%)</label><input type="number" id="m1" value="0.00" step="0.01"></div>
-            <div class="matrix-input"><label>2x (%)</label><input type="number" id="m2" value="3.50" step="0.01"></div>
-            <div class="matrix-input"><label>3x (%)</label><input type="number" id="m3" value="5.20" step="0.01"></div>
-            <div class="matrix-input"><label>4x (%)</label><input type="number" id="m4" value="7.00" step="0.01"></div>
-            <div class="matrix-input"><label>5x (%)</label><input type="number" id="m5" value="8.90" step="0.01"></div>
-            <div class="matrix-input"><label>6x (%)</label><input type="number" id="m6" value="10.50" step="0.01"></div>
-            <div class="matrix-input"><label>7x (%)</label><input type="number" id="m7" value="12.20" step="0.01"></div>
-            <div class="matrix-input"><label>8x (%)</label><input type="number" id="m8" value="14.00" step="0.01"></div>
-            <div class="matrix-input"><label>9x (%)</label><input type="number" id="m9" value="15.80" step="0.01"></div>
-            <div class="matrix-input"><label>10x (%)</label><input type="number" id="m10" value="21.90" step="0.01"></div>
-            <div class="matrix-input"><label>11x (%)</label><input type="number" id="m11" value="19.20" step="0.01"></div>
-            <div class="matrix-input"><label>12x (%)</label><input type="number" id="m12" value="21.00" step="0.01"></div>
+            <div class="matrix-input"><label>1x (%)</label><input type="text" id="m1" value="0,00"></div>
+            <div class="matrix-input"><label>2x (%)</label><input type="text" id="m2" value="3,50"></div>
+            <div class="matrix-input"><label>3x (%)</label><input type="text" id="m3" value="5,20"></div>
+            <div class="matrix-input"><label>4x (%)</label><input type="text" id="m4" value="7,00"></div>
+            <div class="matrix-input"><label>5x (%)</label><input type="number" id="m5" value="8,90" step="0.01"></div>
+            <div class="matrix-input"><label>6x (%)</label><input type="text" id="m6" value="10,50"></div>
+            <div class="matrix-input"><label>7x (%)</label><input type="text" id="m7" value="12,20"></div>
+            <div class="matrix-input"><label>8x (%)</label><input type="text" id="m8" value="14,00"></div>
+            <div class="matrix-input"><label>9x (%)</label><input type="text" id="m9" value="15,80"></div>
+            <div class="matrix-input"><label>10x (%)</label><input type="text" id="m10" value="21,90"></div>
+            <div class="matrix-input"><label>11x (%)</label><input type="text" id="m11" value="19,20"></div>
+            <div class="matrix-input"><label>12x (%)</label><input type="text" id="m12" value="21,00"></div>
         </div>
     </div>
 
@@ -405,6 +404,15 @@
     
     function format(v) { return v.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }); }
 
+    // Função de inteligência artificial para ler e tratar números no padrão PT-BR
+    function parseBrFloat(val) {
+        if (typeof val === 'number') return val;
+        if (!val) return 0;
+        // Remove espaços, substitui pontos de milhares por nada e transforma a vírgula em ponto
+        let limpo = val.toString().replace(/\s/g, '').replace(/\./g, '').replace(',', '.');
+        return parseFloat(limpo) || 0;
+    }
+
     baseFields.forEach(f => {
         const el = document.getElementById(f);
         el.addEventListener('input', update);
@@ -418,13 +426,20 @@
     }
 
     function update() {
+        // Captura e sanitização inteligente dos campos
         const val = {};
         baseFields.forEach(f => {
             const el = document.getElementById(f);
-            val[f] = el.type === 'number' ? (parseFloat(el.value) || 0) : el.value;
+            if (el.tagName === 'SELECT') {
+                val[f] = el.value;
+            } else if (f === 'numParcelas' || f === 'limiteAbsorcao' || f === 'prazoGarantia') {
+                val[f] = parseInt(el.value) || 0;
+            } else {
+                val[f] = parseBrFloat(el.value);
+            }
         });
 
-        // Visibilidade Dinâmica
+        // Visibilidade das condicionais
         document.getElementById('matrixPanel').style.display = val.modeloCalculo === 'custom' ? 'block' : 'none';
         document.getElementById('groupTaxaLinear').style.display = val.modeloCalculo === 'custom' ? 'none' : 'flex';
         document.getElementById('groupAbsorcao').style.display = val.repassarJuros === 'parcial' ? 'flex' : 'none';
@@ -434,9 +449,9 @@
         let pAlvo = Math.min(12, Math.max(1, val.numParcelas));
         let jurosTotalPercentual = 0;
 
-        // Regra de Cálculo Linear ou por Matriz Customizada
+        // Regra de juros baseada no seletor corrigido
         if (val.modeloCalculo === 'custom') {
-            jurosTotalPercentual = parseFloat(document.getElementById(`m${pAlvo}`).value) || 0;
+            jurosTotalPercentual = parseBrFloat(document.getElementById(`m${pAlvo}`).value);
         } else if (val.modeloCalculo === 'auto_mensal') {
             jurosTotalPercentual = pAlvo > 1 ? (val.taxaParc * pAlvo) : 0;
         } else {
@@ -455,7 +470,7 @@
         } else if (val.repassarJuros === 'parcial') {
             if (pAlvo > val.limiteAbsorcao) {
                 if (val.modeloCalculo === 'custom') {
-                    taxaJuroAbsorvida = parseFloat(document.getElementById(`m${val.limiteAbsorcao}`).value) || 0;
+                    taxaJuroAbsorvida = parseBrFloat(document.getElementById(`m${val.limiteAbsorcao}`).value);
                 } else if (val.modeloCalculo === 'auto_mensal') {
                     taxaJuroAbsorvida = val.taxaParc * val.limiteAbsorcao;
                 } else {
@@ -468,7 +483,7 @@
             }
         }
 
-        // Fluxo Logístico Financeiro Appmax
+        // Esteira Financeira
         const dParcCliente = val.vendaBruta * (taxaJuroCliente / 100);
         const valorCheckoutFinal = val.vendaBruta + dParcCliente;
         
@@ -485,7 +500,7 @@
         const res30 = saldoSobra - valorSaqueFinal;
         const resAnt = saldoSobra - dAnte - valorSaqueFinal;
 
-        // Set das Variáveis da Interface/PDF
+        // Injeta os dados limpos nas tabelas
         document.getElementById('lCheckout').innerText = format(val.vendaBruta);
         document.getElementById('lParcelas').innerText = pAlvo;
         document.getElementById('lGarantiaTxt').innerText = `${format(dGar)} (${val.prazoGarantia}d)`;
@@ -511,13 +526,13 @@
         document.getElementById('vFinalAnt').innerText = format(resAnt);
         document.getElementById('vDiferenca').innerText = format(res30 - resAnt);
 
-        // Template Enxuto de Chat
+        // Gera a prévia inteligente do chat
         document.getElementById('chatTemplateTextarea').value = 
 `Olá! Fiz o fechamento dos cálculos com base nos termos comerciais do seu plano. Segue o detalhamento simplificado:
 
 • Total Líquido na Tela: ${format(liqAppmaxMesa)}
 • Desconto da Taxa de Garantia (${val.taxaGar}%): - ${format(dGar)} (Liberado para saque em ${val.prazoGarantia} dias)
-• Saldo Restante pós-garantie: ${format(liqAppmaxMesa - dGar)}
+• Saldo Restante pós-garantia: ${format(liqAppmaxMesa - dGar)}
 
 A partir disso, você tem duas opções de recebimento:
 
