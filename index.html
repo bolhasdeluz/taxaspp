@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Simulador de Precificação Customizada | Appmax</title>
+    <title>Simulador de Precificação Interna | Appmax</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <style>
@@ -121,7 +121,7 @@
 
         .rules-summary {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
             gap: 10px;
             background: var(--appmax-purple-light);
             padding: 14px 30px;
@@ -150,12 +150,12 @@
     </div>
 
     <h1>Configurador de Política de Taxas</h1>
-    <div class="subtitle">Ajuste de margens com suporte a tabelas customizadas e regras flexíveis de saque.</div>
+    <div class="subtitle">Simulação focada no repasse real de custos operacionais do lojista.</div>
     
     <div class="settings-panel">
         <div class="input-group">
-            <label>Valor Base do Produto (R$)</label>
-            <input type="number" id="vendaBruta" value="1000.00" step="0.01">
+            <label>Valor Base do Produto + Frete (R$)</label>
+            <input type="number" id="vendaBruta" value="195.30" step="0.01">
         </div>
         <div class="input-group">
             <label>Nº de Parcelas Selecionado</label>
@@ -176,8 +176,8 @@
         <div class="input-group">
             <label>Repassar Juros Pro Cliente?</label>
             <select id="repassarJuros">
+                <option value="sim" selected>Sim (Cliente paga os juros no checkout)</option>
                 <option value="nao">Não (Absorver tudo na margem)</option>
-                <option value="sim">Sim (Repassar juros ao cliente)</option>
                 <option value="parcial">Absorção Parcial (Até Parcela X)</option>
             </select>
         </div>
@@ -205,10 +205,10 @@
             <label>Configuração de Saque</label>
             <select id="statusSaque">
                 <option value="cobrar">Cobrar Taxa Fixa</option>
-                <option value="isento">Não contém / Isento</option>
+                <option value="isento" selected>Não contém / Isento</option>
             </select>
         </div>
-        <div class="input-group" id="groupValorSaque">
+        <div class="input-group" id="groupValorSaque" style="display:none;">
             <label>Valor da Taxa de Saque (R$)</label>
             <input type="number" id="taxaSaque" value="3.67" step="0.01">
         </div>
@@ -238,15 +238,15 @@
         <div class="report-header">
             <div class="report-header-info">
                 <h2>Análise Estratégica de Margem</h2>
-                <p>Simulação com base na política de repasse e juros parametrizados</p>
+                <p>Fluxo líquido de faturamento desconsiderando taxas repassadas ao checkout</p>
             </div>
             <div class="appmax-logo-text" style="color: white; font-size: 20px;"><span>app</span>max</div>
         </div>
 
         <div class="rules-summary">
-            <span>Cobrança Checkout: <span id="lCheckout">R$ 0,00</span></span>
-            <span>Nº Parcelas: <span id="lParcelas">0</span>x</span>
-            <span>Juros Globais: <span id="lJurosTxt">0%</span></span>
+            <span>Valor Base do Pedido: <span id="lCheckout">R$ 0,00</span></span>
+            <span>Parcelas: <span id="lParcelas">0</span>x</span>
+            <span>Política de Juros: <span id="lPoliticaTxt">-</span></span>
             <span>Tarifa Saque: <span id="lSaqueTxt">R$ 0,00</span></span>
         </div>
 
@@ -254,19 +254,19 @@
             <table>
                 <thead>
                     <tr>
-                        <th>Fluxo de Entrada e Descontos</th>
+                        <th>Fluxo de Entrada e Descontos Reais</th>
                         <th class="text-right">Recebimento 30 Dias</th>
                         <th class="text-right">Recebimento Antecipado</th>
                     </tr>
                 </thead>
                 <tbody>
                     <tr>
-                        <td><b>Valor Total Pago pelo Cliente (Checkout)</b></td>
+                        <td><b>Valor Base do Pedido (Produto + Frete)</b></td>
                         <td class="text-right" id="vBruto30">R$ 0,00</td>
                         <td class="text-right" id="vBrutoAnt">R$ 0,00</td>
                     </tr>
                     <tr>
-                        <td>Taxa de Processamento Appmax Base</td>
+                        <td>Taxa de Processamento Appmax Base (4.99%)</td>
                         <td class="text-right" id="vProc30">- R$ 0,00</td>
                         <td class="text-right" id="vProcAnt">- R$ 0,00</td>
                     </tr>
@@ -276,7 +276,7 @@
                         <td class="text-right" id="vGateAnt">- R$ 0,00</td>
                     </tr>
                     <tr>
-                        <td>Custo de Parcelamento (Parte Absorvida)</td>
+                        <td>Taxa de Parcelamento (Apenas Parte Absorvida)</td>
                         <td class="text-right" id="vParc30">- R$ 0,00</td>
                         <td class="text-right" id="vParcAnt">- R$ 0,00</td>
                     </tr>
@@ -286,7 +286,7 @@
                         <td class="text-right" id="vLiqAnt">R$ 0,00</td>
                     </tr>
                     <tr>
-                        <td>Retenção de Garantia (15% sobre o Checkout)</td>
+                        <td>Retenção de Garantia (15% sobre o Base)</td>
                         <td class="text-right" id="vGar30">- R$ 0,00</td>
                         <td class="text-right" id="vGarAnt">- R$ 0,00</td>
                     </tr>
@@ -310,7 +310,7 @@
         </div>
 
         <div class="footer-note">
-            <b>Nota de Auditoria Interna:</b> Análise baseada no comportamento simulado. O custo total direto para manter a antecipação imediata nesta operação é de <span id="vDiferenca" style="font-weight: 700; color: var(--appmax-purple);">R$ 0,00</span>.
+            <b>Nota de Auditoria Interna:</b> Juros cobrados diretamente do consumidor no checkout não integram o fluxo de receitas do lojista. O custo total para antecipação imediata deste saldo é de <span id="vDiferenca" style="font-weight: 700; color: var(--appmax-purple);">R$ 0,00</span>.
         </div>
     </div>
 </div>
@@ -332,7 +332,6 @@
         update();
     });
 
-    // Controla visibilidade do input de valor do saque
     document.getElementById('statusSaque').addEventListener('change', function() {
         document.getElementById('groupValorSaque').style.display = (this.value === 'cobrar') ? 'flex' : 'none';
         update();
@@ -349,9 +348,7 @@
             val[f] = el.type === 'number' ? (parseFloat(el.value) || 0) : el.value;
         });
 
-        // Forçar saque = 0 se estiver configurado como isento
         const valorSaqueFinal = val.statusSaque === 'isento' ? 0 : val.taxaSaque;
-
         let jurosTotalPedido = 0;
         let pAlvo = Math.min(12, Math.max(1, val.numParcelas));
 
@@ -363,52 +360,46 @@
             jurosTotalPedido = pAlvo > 1 ? val.taxaParc : 0;
         }
 
-        let taxaJuroCliente = 0;
         let taxaJuroAbsorvida = 0;
 
-        if (val.repassarJuros === 'sim') {
-            taxaJuroCliente = jurosTotalPedido;
-            taxaJuroAbsorvida = 0;
-        } else if (val.repassarJuros === 'nao') {
-            taxaJuroCliente = 0;
+        if (val.repassarJuros === 'nao') {
             taxaJuroAbsorvida = jurosTotalPedido;
         } else if (val.repassarJuros === 'parcial') {
             if (pAlvo > val.limiteAbsorcao) {
                 if (val.modeloCalculo === 'custom') {
                     taxaJuroAbsorvida = parseFloat(document.getElementById(`m${val.limiteAbsorcao}`).value) || 0;
-                    taxaJuroCliente = Math.max(0, jurosTotalPedido - taxaJuroAbsorvida);
                 } else if (val.modeloCalculo === 'auto_mensal') {
                     taxaJuroAbsorvida = val.taxaParc * val.limiteAbsorcao;
-                    taxaJuroCliente = val.taxaParc * (pAlvo - val.limiteAbsorcao);
                 } else {
                     taxaJuroAbsorvida = (jurosTotalPedido / pAlvo) * val.limiteAbsorcao;
-                    taxaJuroCliente = jurosTotalPedido - taxaJuroAbsorvida;
                 }
             } else {
-                taxaJuroCliente = 0;
                 taxaJuroAbsorvida = jurosTotalPedido;
             }
         }
 
-        const valorCheckout = val.vendaBruta * (1 + (taxaJuroCliente / 100));
-        const dProc = valorCheckout * (val.taxaProc / 100);
+        // A Appmax desconta o processamento comercial (4.99%) sobre o valor total do produto (R$ 195,30)
+        const dProc = val.vendaBruta * (val.taxaProc / 100);
         const dParcAbsorvido = val.vendaBruta * (taxaJuroAbsorvida / 100);
         
-        const liqAppmax = valorCheckout - dProc - val.taxaGate - dParcAbsorvido;
-        const dGar = valorCheckout * (val.taxaGar / 100);
+        // Fluxo financeiro real
+        const liqAppmax = val.vendaBruta - dProc - val.taxaGate - dParcAbsorvido;
+        const dGar = val.vendaBruta * (val.taxaGar / 100);
         const saldoSobra = liqAppmax - dGar;
         const dAnte = saldoSobra * (val.taxaAnte / 100);
 
         const res30 = saldoSobra - valorSaqueFinal;
         const resAnt = saldoSobra - dAnte - valorSaqueFinal;
 
-        document.getElementById('lCheckout').innerText = format(valorCheckout);
+        document.getElementById('lCheckout').innerText = format(val.vendaBruta);
         document.getElementById('lParcelas').innerText = pAlvo;
         document.getElementById('lJurosTxt').innerText = jurosTotalPedido.toFixed(2) + '%';
         document.getElementById('lSaqueTxt').innerText = valorSaqueFinal === 0 ? 'Isento' : format(valorSaqueFinal);
+        document.getElementById('lPoliticaTxt').innerText = 
+            val.repassarJuros === 'sim' ? 'Repasse Total (Consumidor)' : (val.repassarJuros === 'nao' ? 'Absorção Total' : `Absorve até ${val.limiteAbsorcao}x`);
 
-        document.getElementById('vBruto30').innerText = format(valorCheckout);
-        document.getElementById('vBrutoAnt').innerText = format(valorCheckout);
+        document.getElementById('vBruto30').innerText = format(val.vendaBruta);
+        document.getElementById('vBrutoAnt').innerText = format(val.vendaBruta);
         document.getElementById('vProc30').innerText = '- ' + format(dProc);
         document.getElementById('vProcAnt').innerText = '- ' + format(dProc);
         document.getElementById('vGate30').innerText = '- ' + format(val.taxaGate);
