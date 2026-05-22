@@ -36,38 +36,14 @@
             box-shadow: 0 10px 30px rgba(29, 22, 71, 0.04);
         }
 
-        /* Estilização do Logo Fiel à Appmax */
         .brand-header {
             display: flex;
             align-items: center;
             margin-bottom: 30px;
         }
-        .appmax-logo {
-            display: flex;
-            align-items: center;
-            font-weight: 800;
-            font-size: 28px;
-            color: var(--appmax-dark);
-            letter-spacing: -1px;
-        }
-        .logo-box {
-            position: relative;
-            width: 24px;
-            height: 24px;
-            background: var(--appmax-purple);
-            border-radius: 6px;
-            margin-right: 8px;
-            display: inline-block;
-        }
-        .logo-box::after {
-            content: '';
-            position: absolute;
-            width: 12px;
-            height: 12px;
-            border-top: 3px solid white;
-            border-right: 3px solid white;
-            top: 4px;
-            right: 4px;
+        .appmax-logo-img {
+            height: 32px;
+            width: auto;
         }
 
         h1 { 
@@ -77,7 +53,6 @@
             margin-bottom: 20px;
         }
 
-        /* Painel de Configurações das Taxas */
         .settings-panel {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -128,7 +103,6 @@
         }
         .btn-generate:hover { background: #7f4dff; }
 
-        /* Estrutura Exclusiva do PDF */
         #pdf-report {
             padding: 0;
             background: white;
@@ -159,10 +133,7 @@
         }
 
         .table-section { padding: 30px; }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-        }
+        table { width: 100%; border-collapse: collapse; }
         th { 
             text-align: left; 
             padding: 12px 15px; 
@@ -179,22 +150,14 @@
         .total-row td { border: none; padding: 18px 15px; font-size: 16px; color: white; }
 
         .text-right { text-align: right; }
-        .val-30 { color: var(--appmax-purple); font-weight: 600; }
-        .val-ant { color: #2ec4b6; font-weight: 600; }
-
-        .footer-note {
-            padding: 0 30px 35px 30px;
-            font-size: 11px;
-            color: var(--text-muted);
-            line-height: 1.6;
-        }
+        .footer-note { padding: 0 30px 35px 30px; font-size: 11px; color: var(--text-muted); line-height: 1.6; }
     </style>
 </head>
 <body>
 
 <div class="container">
     <div class="brand-header">
-        <div class="appmax-logo"><span class="logo-box"></span>appmax</div>
+        <img class="appmax-logo-img" src="https://appmax.com.br/assets/img/logo-appmax.svg" alt="Appmax">
     </div>
 
     <h1>Configurador de Taxas</h1>
@@ -234,7 +197,7 @@
                 <h2>Demonstrativo de Recebíveis</h2>
                 <p>Simulação de liquidação de transações e fluxo de caixa</p>
             </div>
-            <div class="appmax-logo" style="color: white;"><span class="logo-box" style="background: white; width:18px; height:18px; border-radius:4px;"><span style="border-top-color:var(--appmax-purple); border-right-color:var(--appmax-purple); top:3px; right:3px; width:8px; height:8px;"></span></span>appmax</div>
+            <img style="height: 28px; filter: brightness(0) invert(1);" src="https://appmax.com.br/assets/img/logo-appmax.svg" alt="Appmax">
         </div>
 
         <div class="rules-summary">
@@ -341,3 +304,35 @@
         
         document.getElementById('vLiq30').innerText = format(liqAppmax);
         document.getElementById('vLiqAnt').innerText = format(liqAppmax);
+        
+        document.getElementById('vGar30').innerText = '- ' + format(dGar);
+        document.getElementById('vGarAnt').innerText = '- ' + format(dGar);
+        
+        document.getElementById('vAnteAnt').innerText = '- ' + format(dAnte);
+        
+        document.getElementById('vSaque30').innerText = '- ' + format(val.taxaSaque);
+        document.getElementById('vSaqueAnt').innerText = '- ' + format(val.taxaSaque);
+        
+        document.getElementById('vFinal30').innerText = format(res30);
+        document.getElementById('vFinalAnt').innerText = format(resAnt);
+        
+        document.getElementById('vDiferenca').innerText = format(res30 - resAnt);
+    }
+
+    fields.forEach(f => document.getElementById(f).addEventListener('input', update));
+    update();
+
+    function gerarPDF() {
+        const element = document.getElementById('pdf-report');
+        const opt = {
+            margin: [0, 0, 0, 0],
+            filename: 'Relatorio_Financeiro_Appmax.pdf',
+            image: { type: 'jpeg', quality: 1 },
+            html2canvas: { scale: 3, useCORS: true },
+            jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+        };
+        html2pdf().set(opt).from(element).save();
+    }
+</script>
+</body>
+</html>
