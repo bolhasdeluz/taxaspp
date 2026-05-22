@@ -39,7 +39,7 @@
         .brand-header {
             display: flex;
             align-items: center;
-            margin-bottom: 30px;
+            margin-bottom: 20px;
         }
         .appmax-logo-text {
             font-weight: 800;
@@ -50,17 +50,30 @@
         .appmax-logo-text span { color: var(--appmax-purple); }
 
         h1 { font-size: 20px; font-weight: 700; color: var(--appmax-dark); margin-bottom: 5px; }
-        .subtitle { font-size: 14px; color: var(--text-muted); margin-bottom: 25px; }
+        .subtitle { font-size: 14px; color: var(--text-muted); margin-bottom: 30px; }
 
-        .settings-panel {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-            gap: 20px;
-            margin-bottom: 25px;
-            padding: 25px;
+        /* Blocos Organizacionais do Painel */
+        .section-block {
             background: #faf9ff;
-            border-radius: 12px;
             border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        .section-block-title {
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--appmax-purple);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 15px;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 5px;
+        }
+        .fields-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+            gap: 15px;
         }
 
         .input-group { display: flex; flex-direction: column; }
@@ -69,18 +82,23 @@
             font-weight: 700; 
             text-transform: uppercase; 
             color: var(--text-muted);
-            margin-bottom: 8px;
-            letter-spacing: 0.5px;
+            margin-bottom: 6px;
+            letter-spacing: 0.3px;
         }
         .input-group input, .input-group select {
-            padding: 12px 14px;
+            padding: 10px 12px;
             border: 1px solid var(--border-color);
-            border-radius: 8px;
+            border-radius: 6px;
             font-size: 14px;
             color: var(--appmax-dark);
             font-weight: 500;
             background: white;
             transition: all 0.2s;
+        }
+        .input-group input:focus, .input-group select:focus {
+            outline: none;
+            border-color: var(--appmax-purple);
+            box-shadow: 0 0 0 3px rgba(148, 102, 255, 0.1);
         }
 
         .custom-matrix-panel {
@@ -88,13 +106,13 @@
             border: 1px dashed var(--appmax-purple);
             padding: 20px;
             border-radius: 12px;
-            margin-bottom: 30px;
+            margin-bottom: 25px;
         }
-        .matrix-title { font-size: 12px; font-weight: 700; color: var(--appmax-purple); margin-bottom: 15px; text-transform: uppercase; }
+        .matrix-title { font-size: 11px; font-weight: 700; color: var(--appmax-purple); margin-bottom: 12px; text-transform: uppercase; }
         .matrix-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
-            gap: 12px;
+            gap: 10px;
         }
         .matrix-input { display: flex; flex-direction: column; }
         .matrix-input label { font-size: 11px; font-weight: 600; margin-bottom: 4px; color: var(--text-muted); }
@@ -124,7 +142,6 @@
         .btn-pdf:hover { background: #7f4dff; }
         .btn-chat { background: #10b981; }
         .btn-chat:hover { background: #059669; }
-        .btn-action:active { transform: scale(0.98); }
 
         .preview-box-container {
             background: #fafafa;
@@ -133,17 +150,10 @@
             padding: 20px;
             margin-bottom: 40px;
         }
-        .preview-box-title {
-            font-size: 12px;
-            font-weight: 700;
-            color: #4b5563;
-            margin-bottom: 10px;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
+        .preview-box-title { font-size: 12px; font-weight: 700; color: #4b5563; margin-bottom: 10px; text-transform: uppercase; }
         .chat-textarea {
             width: 100%;
-            height: 260px;
+            height: 250px;
             border: 1px solid var(--border-color);
             border-radius: 8px;
             padding: 15px;
@@ -192,76 +202,97 @@
     </div>
 
     <h1>Configurador de Política de Taxas</h1>
-    <div class="subtitle">Simulação operacional ajustada com foco na conferência de repasses.</div>
+    <div class="subtitle">Insira as informações do pedido nas categorias correspondentes para calcular a margem operacional.</div>
     
-    <div class="settings-panel">
-        <div class="input-group">
-            <label>Valor de Venda do Produto (R$)</label>
-            <input type="number" id="vendaBruta" value="1277.67" step="0.01">
+    <div class="section-block">
+        <div class="section-block-title">1. Dados Fundamentais da Venda</div>
+        <div class="fields-grid">
+            <div class="input-group">
+                <label>Valor de Venda do Produto (R$)</label>
+                <input type="number" id="vendaBruta" value="1277.67" step="0.01">
+            </div>
+            <div class="input-group">
+                <label>Nº de Parcelas Selecionado</label>
+                <input type="number" id="numParcelas" value="10" min="1" max="12">
+            </div>
         </div>
-        <div class="input-group">
-            <label>Nº de Parcelas Selecionado</label>
-            <input type="number" id="numParcelas" value="10" min="1" max="12">
+    </div>
+
+    <div class="section-block">
+        <div class="section-block-title">2. Estratégia de Parcelamento (Juros)</div>
+        <div class="fields-grid">
+            <div class="input-group">
+                <label>Modelo de Cálculo</label>
+                <select id="modeloCalculo">
+                    <option value="auto_mensal" selected>Automático: Multiplicar ao Mês</option>
+                    <option value="auto_fixo">Automático: Taxa Fixa Única</option>
+                    <option value="custom">Personalizado: Tabela Mês a Mês</option>
+                </select>
+            </div>
+            <div class="input-group" id="groupTaxaLinear">
+                <label>Taxa de Parcelamento Base (%)</label>
+                <input type="number" id="taxaParc" value="2.19" step="0.01">
+            </div>
+            <div class="input-group">
+                <label>Repassar Juros Pro Cliente?</label>
+                <select id="repassarJuros">
+                    <option value="sim" selected>Sim (Cliente paga os juros no checkout)</option>
+                    <option value="nao">Não (Absorver tudo na margem)</option>
+                    <option value="parcial">Absorção Parcial (Até Parcela X)</option>
+                </select>
+            </div>
+            <div class="input-group" id="groupAbsorcao" style="display:none;">
+                <label>Absorver Juros Até Parcela X</label>
+                <input type="number" id="limiteAbsorcao" value="3" min="1" max="12">
+            </div>
         </div>
-        <div class="input-group">
-            <label>Modelo das Parcelas</label>
-            <select id="modeloCalculo">
-                <option value="auto_mensal" selected>Automático: Multiplicar ao Mês</option>
-                <option value="auto_fixo">Automático: Taxa Fixa</option>
-                <option value="custom">Personalizado: Tabela Mês a Mês</option>
-            </select>
+    </div>
+
+    <div class="section-block">
+        <div class="section-block-title">3. Custos Fixos do Gateway (Appmax)</div>
+        <div class="fields-grid">
+            <div class="input-group">
+                <label>Taxa Appmax Base (%)</label>
+                <input type="number" id="taxaProc" value="4.99" step="0.01">
+            </div>
+            <div class="input-group">
+                <label>Gateway Fixo (R$)</label>
+                <input type="number" id="taxaGate" value="0.99" step="0.01">
+            </div>
         </div>
-        <div class="input-group" id="groupTaxaLinear">
-            <label>Taxa de Parcelamento Base (%)</label>
-            <input type="number" id="taxaParc" value="2.19" step="0.01">
-        </div>
-        <div class="input-group">
-            <label>Repassar Juros Pro Cliente?</label>
-            <select id="repassarJuros">
-                <option value="sim" selected>Sim (Cliente paga os juros no checkout)</option>
-                <option value="nao">Não (Absorver tudo na margem)</option>
-                <option value="parcial">Absorção Parcial (Até Parcela X)</option>
-            </select>
-        </div>
-        <div class="input-group" id="groupAbsorcao" style="display:none;">
-            <label>Absorver Juros Até Parcela X</label>
-            <input type="number" id="limiteAbsorcao" value="3" min="1" max="12">
-        </div>
-        <div class="input-group">
-            <label>Taxa Appmax Base (%)</label>
-            <input type="number" id="taxaProc" value="4.99" step="0.01">
-        </div>
-        <div class="input-group">
-            <label>Gateway Fixo (R$)</label>
-            <input type="number" id="taxaGate" value="0.99" step="0.01">
-        </div>
-        <div class="input-group">
-            <label>Garantia Base (%)</label>
-            <input type="number" id="taxaGar" value="15.00" step="0.01">
-        </div>
-        <div class="input-group">
-            <label>Liberação da Garantia (Dias)</label>
-            <input type="number" id="prazoGarantia" value="30" min="0">
-        </div>
-        <div class="input-group">
-            <label>Antecipação (%)</label>
-            <input type="number" id="taxaAnte" value="1.49" step="0.01">
-        </div>
-        <div class="input-group">
-            <label>Configuração de Saque</label>
-            <select id="statusSaque">
-                <option value="cobrar">Cobrar Taxa Fixa</option>
-                <option value="isento" selected>Não contém / Isento</option>
-            </select>
-        </div>
-        <div class="input-group" id="groupValorSaque" style="display:none;">
-            <label>Valor da Taxa de Saque (R$)</label>
-            <input type="number" id="taxaSaque" value="3.67" step="0.01">
+    </div>
+
+    <div class="section-block">
+        <div class="section-block-title">4. Retenção, Prazos e Saque</div>
+        <div class="fields-grid">
+            <div class="input-group">
+                <label>Garantia Base (%)</label>
+                <input type="number" id="taxaGar" value="15.00" step="0.01">
+            </div>
+            <div class="input-group">
+                <label>Liberação da Garantia (Dias)</label>
+                <input type="number" id="prazoGarantia" value="30" min="0">
+            </div>
+            <div class="input-group">
+                <label>Taxa de Antecipação (%)</label>
+                <input type="number" id="taxaAnte" value="1.49" step="0.01">
+            </div>
+            <div class="input-group">
+                <label>Configuração de Saque</label>
+                <select id="statusSaque">
+                    <option value="cobrar">Cobrar Taxa Fixa</option>
+                    <option value="isento" selected>Não contém / Isento</option>
+                </select>
+            </div>
+            <div class="input-group" id="groupValorSaque" style="display:none;">
+                <label>Valor da Taxa de Saque (R$)</label>
+                <input type="number" id="taxaSaque" value="3.67" step="0.01">
+            </div>
         </div>
     </div>
 
     <div class="custom-matrix-panel" id="matrixPanel" style="display: none;">
-        <div class="matrix-title">Tabela de Parcelamento Customizada (Defina a Taxa Final Acumulada para cada Mês)</div>
+        <div class="matrix-title">Tabela de Parcelamento Customizada (Taxa Final Acumulada por Mês)</div>
         <div class="matrix-grid">
             <div class="matrix-input"><label>1x (%)</label><input type="number" id="m1" value="0.00" step="0.01"></div>
             <div class="matrix-input"><label>2x (%)</label><input type="number" id="m2" value="3.50" step="0.01"></div>
@@ -298,7 +329,7 @@
         </div>
 
         <div class="rules-summary">
-            <span>Valor Líquido Original: <span id="lCheckout">R$ 0,00</span></span>
+            <span>Valor Venda Base: <span id="lCheckout">R$ 0,00</span></span>
             <span>Parcelas: <span id="lParcelas">0</span>x</span>
             <span>Garantia Retida: <span id="lGarantiaTxt">R$ 0,00</span></span>
             <span>Tarifa Saque: <span id="lSaqueTxt">R$ 0,00</span></span>
@@ -315,12 +346,12 @@
                 </thead>
                 <tbody>
                     <tr>
-                        <td><b>Valor Base da Venda</b></td>
+                        <td><b>Valor Bruto de Venda do Produto</b></td>
                         <td class="text-right" id="vBruto30">R$ 0,00</td>
                         <td class="text-right" id="vBrutoAnt">R$ 0,00</td>
                     </tr>
                     <tr>
-                        <td>Custo do Parcelamento (Juros Globais)</td>
+                        <td>Custo do Parcelamento (Juros Totais Calculados)</td>
                         <td class="text-right" id="vParc30">R$ 0,00</td>
                         <td class="text-right" id="vParcAnt">R$ 0,00</td>
                     </tr>
@@ -340,7 +371,7 @@
                         <td class="text-right" id="vLiqAnt">R$ 0,00</td>
                     </tr>
                     <tr>
-                        <td>Retenção da Taxa de Garantia</td>
+                        <td>Retenção da Taxa de Garantia Interna</td>
                         <td class="text-right" id="vGar30">- R$ 0,00</td>
                         <td class="text-right" id="vGarAnt">- R$ 0,00</td>
                     </tr>
@@ -364,7 +395,7 @@
         </div>
 
         <div class="footer-note">
-            <b>Nota:</b> Quando o juro é repassado, ele entra somando no checkout e sai abatido integralmente no repasse da operadora, neutralizando o custo para o lojista. Diferença de antecipação imediata: <span id="vDiferenca" style="font-weight: 700; color: var(--appmax-purple);">R$ 0,00</span>.
+            <b>Nota:</b> Quando o juro é repassado, o valor final do checkout absorve o acréscimo de parcelamento, neutralizando a despesa financeira na margem do lojista. Diferença de antecipação: <span id="vDiferenca" style="font-weight: 700; color: var(--appmax-purple);">R$ 0,00</span>.
         </div>
     </div>
 </div>
@@ -393,6 +424,7 @@
             val[f] = el.type === 'number' ? (parseFloat(el.value) || 0) : el.value;
         });
 
+        // Visibilidade Dinâmica
         document.getElementById('matrixPanel').style.display = val.modeloCalculo === 'custom' ? 'block' : 'none';
         document.getElementById('groupTaxaLinear').style.display = val.modeloCalculo === 'custom' ? 'none' : 'flex';
         document.getElementById('groupAbsorcao').style.display = val.repassarJuros === 'parcial' ? 'flex' : 'none';
@@ -402,6 +434,7 @@
         let pAlvo = Math.min(12, Math.max(1, val.numParcelas));
         let jurosTotalPercentual = 0;
 
+        // Regra de Cálculo Linear ou por Matriz Customizada
         if (val.modeloCalculo === 'custom') {
             jurosTotalPercentual = parseFloat(document.getElementById(`m${pAlvo}`).value) || 0;
         } else if (val.modeloCalculo === 'auto_mensal') {
@@ -435,17 +468,16 @@
             }
         }
 
-        // CÁLCULO SEGUINDO A ESTEIRA EXATA DA APPMAX:
+        // Fluxo Logístico Financeiro Appmax
         const dParcCliente = val.vendaBruta * (taxaJuroCliente / 100);
-        const valorCheckoutFinal = val.vendaBruta + dParcCliente; // O que o cliente pagou na maquininha/checkout
+        const valorCheckoutFinal = val.vendaBruta + dParcCliente;
         
-        const dProc = valorCheckoutFinal * (val.taxaProc / 100); // 4.99% morde o checkout total inflado
+        const dProc = valorCheckoutFinal * (val.taxaProc / 100);
         const dParcAbsorvido = val.vendaBruta * (taxaJuroAbsorvida / 100);
+        const custoTotalParcelamentoVisivel = dParcCliente + dParcAbsorvido;
 
-        // O total líquido inicial que aparece na tela do cliente pós taxa base
         const liqAppmaxMesa = valorCheckoutFinal - dProc - val.taxaGate - dParcCliente; 
         
-        // Descontos da sua esteira interna sobre o líquido da tela
         const dGar = liqAppmaxMesa * (val.taxaGar / 100);
         const saldoSobra = liqAppmaxMesa - dGar;
         const dAnte = saldoSobra * (val.taxaAnte / 100);
@@ -453,48 +485,39 @@
         const res30 = saldoSobra - valorSaqueFinal;
         const resAnt = saldoSobra - dAnte - valorSaqueFinal;
 
-        // Atualização dos Labels no Topo
-        document.getElementById('lCheckout').innerText = format(liqAppmaxMesa);
+        // Set das Variáveis da Interface/PDF
+        document.getElementById('lCheckout').innerText = format(val.vendaBruta);
         document.getElementById('lParcelas').innerText = pAlvo;
         document.getElementById('lGarantiaTxt').innerText = `${format(dGar)} (${val.prazoGarantia}d)`;
         document.getElementById('lSaqueTxt').innerText = valorSaqueFinal === 0 ? 'Isento' : format(valorSaqueFinal);
 
-        // Preenchimento da Tabela Dinâmica
         document.getElementById('vBruto30').innerText = format(val.vendaBruta);
         document.getElementById('vBrutoAnt').innerText = format(val.vendaBruta);
-        
-        document.getElementById('vParc30').innerText = '+ ' + format(dParcCliente);
-        document.getElementById('vParcAnt').innerText = '+ ' + format(dParcCliente);
-        
+        document.getElementById('vParc30').innerText = (val.repassarJuros === 'sim' ? '+ ' : '- ') + format(custoTotalParcelamentoVisivel);
+        document.getElementById('vParcAnt').innerText = (val.repassarJuros === 'sim' ? '+ ' : '- ') + format(custoTotalParcelamentoVisivel);
         document.getElementById('vProc30').innerText = '- ' + format(dProc);
         document.getElementById('vProcAnt').innerText = '- ' + format(dProc);
-        
         document.getElementById('vGate30').innerText = '- ' + format(val.taxaGate);
         document.getElementById('vGateAnt').innerText = '- ' + format(val.taxaGate);
-        
         document.getElementById('vLiq30').innerText = format(liqAppmaxMesa);
         document.getElementById('vLiqAnt').innerText = format(liqAppmaxMesa);
-        
         document.getElementById('vGar30').innerText = '- ' + format(dGar);
         document.getElementById('vGarAnt').innerText = '- ' + format(dGar);
-        
         document.getElementById('vAnteAnt').innerText = '- ' + format(dAnte);
         document.getElementById('vAnte30').innerText = format(0);
-        
         document.getElementById('vSaque30').innerText = '- ' + format(valorSaqueFinal);
         document.getElementById('vSaqueAnt').innerText = '- ' + format(valorSaqueFinal);
-        
         document.getElementById('vFinal30').innerText = format(res30);
         document.getElementById('vFinalAnt').innerText = format(resAnt);
         document.getElementById('vDiferenca').innerText = format(res30 - resAnt);
 
-        // Atualização do texto enxuto para o chat
+        // Template Enxuto de Chat
         document.getElementById('chatTemplateTextarea').value = 
 `Olá! Fiz o fechamento dos cálculos com base nos termos comerciais do seu plano. Segue o detalhamento simplificado:
 
 • Total Líquido na Tela: ${format(liqAppmaxMesa)}
 • Desconto da Taxa de Garantia (${val.taxaGar}%): - ${format(dGar)} (Liberado para saque em ${val.prazoGarantia} dias)
-• Saldo Restante pós-garantia: ${format(liqAppmaxMesa - dGar)}
+• Saldo Restante pós-garantie: ${format(liqAppmaxMesa - dGar)}
 
 A partir disso, você tem duas opções de recebimento:
 
