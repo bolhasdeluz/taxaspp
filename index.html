@@ -156,7 +156,7 @@
             border: 1px solid var(--border-color);
             border-radius: 8px;
             padding: 15px;
-            font-family: 'Inter', system-ui, sans-serif;
+            font-family: 'Segoe UI', system-ui, sans-serif;
             font-size: 14px;
             line-height: 1.5;
             color: #1f2937;
@@ -208,11 +208,24 @@
         <div class="fields-grid">
             <div class="input-group">
                 <label>Valor de Venda do Produto (R$)</label>
-                <input type="text" id="vendaBruta" class="mask-money" value="1.277,67">
+                <input type="text" id="vendaBruta" value="1.277,67">
             </div>
             <div class="input-group">
                 <label>Nº de Parcelas Selecionado</label>
-                <input type="number" id="numParcelas" value="10" min="1" max="12">
+                <select id="numParcelas">
+                    <option value="1">1x</option>
+                    <option value="2">2x</option>
+                    <option value="3">3x</option>
+                    <option value="4">4x</option>
+                    <option value="5">5x</option>
+                    <option value="6">6x</option>
+                    <option value="7">7x</option>
+                    <option value="8">8x</option>
+                    <option value="9">9x</option>
+                    <option value="10" selected>10x</option>
+                    <option value="11">11x</option>
+                    <option value="12">12x</option>
+                </select>
             </div>
         </div>
     </div>
@@ -279,11 +292,11 @@
             <div class="input-group">
                 <label>Configuração de Saque</label>
                 <select id="statusSaque">
-                    <option value="cobrar">Cobrar Taxa Fixa</option>
-                    <option value="isento" selected>Não contém / Isento</option>
+                    <option value="cobrar" selected>Cobrar Taxa Fixa</option>
+                    <option value="isento">Não contém / Isento</option>
                 </select>
             </div>
-            <div class="input-group" id="groupValorSaque" style="display:none;">
+            <div class="input-group" id="groupValorSaque">
                 <label>Valor da Taxa de Saque (R$)</label>
                 <input type="text" id="taxaSaque" class="mask-money" value="3,67">
             </div>
@@ -404,7 +417,6 @@
     
     function format(v) { return v.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }); }
 
-    // Funções de Máscaras em Tempo Real
     function aplicarMascaraDinheiro(valor) {
         let v = valor.replace(/\D/g, "");
         v = (v / 100).toFixed(2) + "";
@@ -426,7 +438,6 @@
         return parseFloat(limpo) || 0;
     }
 
-    // Configurando escutas e interceptores de máscara nos inputs de texto
     document.querySelectorAll('.mask-money').forEach(input => {
         input.addEventListener('input', function() {
             this.value = aplicarMascaraDinheiro(this.value);
@@ -441,7 +452,6 @@
         });
     });
 
-    // O input do valor principal recebe um tratamento especial focado na digitação natural
     document.getElementById('vendaBruta').addEventListener('input', function() {
         this.value = aplicarMascaraDinheiro(this.value);
         update();
@@ -449,10 +459,8 @@
 
     baseFields.forEach(f => {
         const el = document.getElementById(f);
-        if(el.tagName === 'SELECT' || el.type === 'number') {
-            el.addEventListener('input', update);
-            el.addEventListener('change', update);
-        }
+        el.addEventListener('input', update);
+        el.addEventListener('change', update);
     });
 
     for(let i=1; i<=12; i++) {
@@ -468,8 +476,10 @@
             const el = document.getElementById(f);
             if (el.tagName === 'SELECT') {
                 val[f] = el.value;
-            } else if (f === 'numParcelas' || f === 'limiteAbsorcao' || f === 'prazoGarantia') {
+            } else if (f === 'limiteAbsorcao' || f === 'prazoGarantia') {
                 val[f] = parseInt(el.value) || 0;
+            } else if (f === 'numParcelas') {
+                val[f] = parseInt(el.value) || 1;
             } else {
                 val[f] = parseBrFloat(el.value);
             }
@@ -481,7 +491,7 @@
         document.getElementById('groupValorSaque').style.display = val.statusSaque === 'cobrar' ? 'flex' : 'none';
 
         const valorSaqueFinal = val.statusSaque === 'isento' ? 0 : val.taxaSaque;
-        let pAlvo = Math.min(12, Math.max(1, val.numParcelas));
+        let pAlvo = val.numParcelas;
         let jurosTotalPercentual = 0;
 
         if (val.modeloCalculo === 'custom') {
@@ -607,7 +617,7 @@ Aplicando a taxa de antecipação comercial de ${val.taxaAnte}%, o valor total l
         html2pdf().set(opt).from(element).save();
     }
 
-    // Inicialização da primeira execução forçando a máscara nos valores iniciais
+    // Inicialização forçando a renderização com máscaras
     document.getElementById('vendaBruta').value = aplicarMascaraDinheiro(document.getElementById('vendaBruta').value);
     document.getElementById('taxaParc').value = aplicarMascaraPercentual(document.getElementById('taxaParc').value);
     document.getElementById('taxaProc').value = aplicarMascaraPercentual(document.getElementById('taxaProc').value);
