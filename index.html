@@ -36,14 +36,20 @@
             box-shadow: 0 10px 30px rgba(29, 22, 71, 0.04);
         }
 
+        /* Estilização para o texto 'Appmax' substituto */
         .brand-header {
             display: flex;
             align-items: center;
             margin-bottom: 30px;
         }
-        .appmax-logo-img {
-            height: 32px;
-            width: auto;
+        .appmax-logo-text {
+            font-weight: 800;
+            font-size: 26px;
+            color: var(--appmax-dark);
+            letter-spacing: -1px;
+        }
+        .appmax-logo-text span {
+            color: var(--appmax-purple);
         }
 
         h1 { 
@@ -157,7 +163,7 @@
 
 <div class="container">
     <div class="brand-header">
-        <img class="appmax-logo-img" src="https://appmax.com.br/assets/img/logo-appmax.svg" alt="Appmax">
+        <div class="appmax-logo-text"><span>app</span>max</div>
     </div>
 
     <h1>Configurador de Taxas</h1>
@@ -197,7 +203,7 @@
                 <h2>Demonstrativo de Recebíveis</h2>
                 <p>Simulação de liquidação de transações e fluxo de caixa</p>
             </div>
-            <img style="height: 28px; filter: brightness(0) invert(1);" src="https://appmax.com.br/assets/img/logo-appmax.svg" alt="Appmax">
+            <div class="appmax-logo-text" style="color: white; font-size: 20px;"><span>app</span>max</div>
         </div>
 
         <div class="rules-summary">
