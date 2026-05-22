@@ -156,7 +156,7 @@
             border: 1px solid var(--border-color);
             border-radius: 8px;
             padding: 15px;
-            font-family: 'Segoe UI', system-ui, sans-serif;
+            font-family: 'Inter', system-ui, sans-serif;
             font-size: 14px;
             line-height: 1.5;
             color: #1f2937;
@@ -208,7 +208,7 @@
         <div class="fields-grid">
             <div class="input-group">
                 <label>Valor de Venda do Produto (R$)</label>
-                <input type="text" id="vendaBruta" value="1.277,67">
+                <input type="text" id="vendaBruta" class="mask-money" value="1.277,67">
             </div>
             <div class="input-group">
                 <label>Nº de Parcelas Selecionado</label>
@@ -230,7 +230,7 @@
             </div>
             <div class="input-group" id="groupTaxaLinear">
                 <label>Taxa de Parcelamento Base (%)</label>
-                <input type="text" id="taxaParc" value="2,19">
+                <input type="text" id="taxaParc" class="mask-percent" value="2,19 %">
             </div>
             <div class="input-group">
                 <label>Repassar Juros Pro Cliente?</label>
@@ -252,11 +252,11 @@
         <div class="fields-grid">
             <div class="input-group">
                 <label>Taxa Appmax Base (%)</label>
-                <input type="text" id="taxaProc" value="4,99">
+                <input type="text" id="taxaProc" class="mask-percent" value="4,99 %">
             </div>
             <div class="input-group">
                 <label>Gateway Fixo (R$)</label>
-                <input type="text" id="taxaGate" value="0,99">
+                <input type="text" id="taxaGate" class="mask-money" value="0,99">
             </div>
         </div>
     </div>
@@ -266,7 +266,7 @@
         <div class="fields-grid">
             <div class="input-group">
                 <label>Garantia Base (%)</label>
-                <input type="text" id="taxaGar" value="15,00">
+                <input type="text" id="taxaGar" class="mask-percent" value="15,00 %">
             </div>
             <div class="input-group">
                 <label>Liberação da Garantia (Dias)</label>
@@ -274,7 +274,7 @@
             </div>
             <div class="input-group">
                 <label>Taxa de Antecipação (%)</label>
-                <input type="text" id="taxaAnte" value="1,49">
+                <input type="text" id="taxaAnte" class="mask-percent" value="1,49 %">
             </div>
             <div class="input-group">
                 <label>Configuração de Saque</label>
@@ -285,7 +285,7 @@
             </div>
             <div class="input-group" id="groupValorSaque" style="display:none;">
                 <label>Valor da Taxa de Saque (R$)</label>
-                <input type="text" id="taxaSaque" value="3,67">
+                <input type="text" id="taxaSaque" class="mask-money" value="3,67">
             </div>
         </div>
     </div>
@@ -293,18 +293,18 @@
     <div class="custom-matrix-panel" id="matrixPanel" style="display: none;">
         <div class="matrix-title">Tabela de Parcelamento Customizada (Taxa Final Acumulada por Mês)</div>
         <div class="matrix-grid">
-            <div class="matrix-input"><label>1x (%)</label><input type="text" id="m1" value="0,00"></div>
-            <div class="matrix-input"><label>2x (%)</label><input type="text" id="m2" value="3,50"></div>
-            <div class="matrix-input"><label>3x (%)</label><input type="text" id="m3" value="5,20"></div>
-            <div class="matrix-input"><label>4x (%)</label><input type="text" id="m4" value="7,00"></div>
-            <div class="matrix-input"><label>5x (%)</label><input type="number" id="m5" value="8,90" step="0.01"></div>
-            <div class="matrix-input"><label>6x (%)</label><input type="text" id="m6" value="10,50"></div>
-            <div class="matrix-input"><label>7x (%)</label><input type="text" id="m7" value="12,20"></div>
-            <div class="matrix-input"><label>8x (%)</label><input type="text" id="m8" value="14,00"></div>
-            <div class="matrix-input"><label>9x (%)</label><input type="text" id="m9" value="15,80"></div>
-            <div class="matrix-input"><label>10x (%)</label><input type="text" id="m10" value="21,90"></div>
-            <div class="matrix-input"><label>11x (%)</label><input type="text" id="m11" value="19,20"></div>
-            <div class="matrix-input"><label>12x (%)</label><input type="text" id="m12" value="21,00"></div>
+            <div class="matrix-input"><label>1x (%)</label><input type="text" id="m1" class="mask-percent" value="0,00 %"></div>
+            <div class="matrix-input"><label>2x (%)</label><input type="text" id="m2" class="mask-percent" value="3,50 %"></div>
+            <div class="matrix-input"><label>3x (%)</label><input type="text" id="m3" class="mask-percent" value="5,20 %"></div>
+            <div class="matrix-input"><label>4x (%)</label><input type="text" id="m4" class="mask-percent" value="7,00 %"></div>
+            <div class="matrix-input"><label>5x (%)</label><input type="text" id="m5" class="mask-percent" value="8,90 %"></div>
+            <div class="matrix-input"><label>6x (%)</label><input type="text" id="m6" class="mask-percent" value="10,50 %"></div>
+            <div class="matrix-input"><label>7x (%)</label><input type="text" id="m7" class="mask-percent" value="12,20 %"></div>
+            <div class="matrix-input"><label>8x (%)</label><input type="text" id="m8" class="mask-percent" value="14,00 %"></div>
+            <div class="matrix-input"><label>9x (%)</label><input type="text" id="m9" class="mask-percent" value="15,80 %"></div>
+            <div class="matrix-input"><label>10x (%)</label><input type="text" id="m10" class="mask-percent" value="21,90 %"></div>
+            <div class="matrix-input"><label>11x (%)</label><input type="text" id="m11" class="mask-percent" value="19,20 %"></div>
+            <div class="matrix-input"><label>12x (%)</label><input type="text" id="m12" class="mask-percent" value="21,00 %"></div>
         </div>
     </div>
 
@@ -404,29 +404,65 @@
     
     function format(v) { return v.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }); }
 
-    // Função de inteligência artificial para ler e tratar números no padrão PT-BR
+    // Funções de Máscaras em Tempo Real
+    function aplicarMascaraDinheiro(valor) {
+        let v = valor.replace(/\D/g, "");
+        v = (v / 100).toFixed(2) + "";
+        v = v.replace(".", ",");
+        v = v.replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1.");
+        return v;
+    }
+
+    function aplicarMascaraPercentual(valor) {
+        let v = valor.replace(/\D/g, "");
+        v = (v / 100).toFixed(2) + "";
+        v = v.replace(".", ",");
+        return v + " %";
+    }
+
     function parseBrFloat(val) {
-        if (typeof val === 'number') return val;
         if (!val) return 0;
-        // Remove espaços, substitui pontos de milhares por nada e transforma a vírgula em ponto
-        let limpo = val.toString().replace(/\s/g, '').replace(/\./g, '').replace(',', '.');
+        let limpo = val.toString().replace(/%/g, '').replace(/\s/g, '').replace(/\./g, '').replace(',', '.');
         return parseFloat(limpo) || 0;
     }
 
+    // Configurando escutas e interceptores de máscara nos inputs de texto
+    document.querySelectorAll('.mask-money').forEach(input => {
+        input.addEventListener('input', function() {
+            this.value = aplicarMascaraDinheiro(this.value);
+            update();
+        });
+    });
+
+    document.querySelectorAll('.mask-percent').forEach(input => {
+        input.addEventListener('input', function() {
+            this.value = aplicarMascaraPercentual(this.value);
+            update();
+        });
+    });
+
+    // O input do valor principal recebe um tratamento especial focado na digitação natural
+    document.getElementById('vendaBruta').addEventListener('input', function() {
+        this.value = aplicarMascaraDinheiro(this.value);
+        update();
+    });
+
     baseFields.forEach(f => {
         const el = document.getElementById(f);
-        el.addEventListener('input', update);
-        el.addEventListener('change', update);
+        if(el.tagName === 'SELECT' || el.type === 'number') {
+            el.addEventListener('input', update);
+            el.addEventListener('change', update);
+        }
     });
 
     for(let i=1; i<=12; i++) {
-        const el = document.getElementById(`m${i}`);
-        el.addEventListener('input', update);
-        el.addEventListener('change', update);
+        document.getElementById(`m${i}`).addEventListener('input', function() {
+            this.value = aplicarMascaraPercentual(this.value);
+            update();
+        });
     }
 
     function update() {
-        // Captura e sanitização inteligente dos campos
         const val = {};
         baseFields.forEach(f => {
             const el = document.getElementById(f);
@@ -439,7 +475,6 @@
             }
         });
 
-        // Visibilidade das condicionais
         document.getElementById('matrixPanel').style.display = val.modeloCalculo === 'custom' ? 'block' : 'none';
         document.getElementById('groupTaxaLinear').style.display = val.modeloCalculo === 'custom' ? 'none' : 'flex';
         document.getElementById('groupAbsorcao').style.display = val.repassarJuros === 'parcial' ? 'flex' : 'none';
@@ -449,7 +484,6 @@
         let pAlvo = Math.min(12, Math.max(1, val.numParcelas));
         let jurosTotalPercentual = 0;
 
-        // Regra de juros baseada no seletor corrigido
         if (val.modeloCalculo === 'custom') {
             jurosTotalPercentual = parseBrFloat(document.getElementById(`m${pAlvo}`).value);
         } else if (val.modeloCalculo === 'auto_mensal') {
@@ -483,7 +517,6 @@
             }
         }
 
-        // Esteira Financeira
         const dParcCliente = val.vendaBruta * (taxaJuroCliente / 100);
         const valorCheckoutFinal = val.vendaBruta + dParcCliente;
         
@@ -500,7 +533,6 @@
         const res30 = saldoSobra - valorSaqueFinal;
         const resAnt = saldoSobra - dAnte - valorSaqueFinal;
 
-        // Injeta os dados limpos nas tabelas
         document.getElementById('lCheckout').innerText = format(val.vendaBruta);
         document.getElementById('lParcelas').innerText = pAlvo;
         document.getElementById('lGarantiaTxt').innerText = `${format(dGar)} (${val.prazoGarantia}d)`;
@@ -526,7 +558,6 @@
         document.getElementById('vFinalAnt').innerText = format(resAnt);
         document.getElementById('vDiferenca').innerText = format(res30 - resAnt);
 
-        // Gera a prévia inteligente do chat
         document.getElementById('chatTemplateTextarea').value = 
 `Olá! Fiz o fechamento dos cálculos com base nos termos comerciais do seu plano. Segue o detalhamento simplificado:
 
@@ -575,6 +606,16 @@ Aplicando a taxa de antecipação comercial de ${val.taxaAnte}%, o valor total l
         };
         html2pdf().set(opt).from(element).save();
     }
+
+    // Inicialização da primeira execução forçando a máscara nos valores iniciais
+    document.getElementById('vendaBruta').value = aplicarMascaraDinheiro(document.getElementById('vendaBruta').value);
+    document.getElementById('taxaParc').value = aplicarMascaraPercentual(document.getElementById('taxaParc').value);
+    document.getElementById('taxaProc').value = aplicarMascaraPercentual(document.getElementById('taxaProc').value);
+    document.getElementById('taxaGate').value = aplicarMascaraDinheiro(document.getElementById('taxaGate').value);
+    document.getElementById('taxaGar').value = aplicarMascaraPercentual(document.getElementById('taxaGar').value);
+    document.getElementById('taxaAnte').value = aplicarMascaraPercentual(document.getElementById('taxaAnte').value);
+    document.getElementById('taxaSaque').value = aplicarMascaraDinheiro(document.getElementById('taxaSaque').value);
+    update();
 </script>
 </body>
 </html>
