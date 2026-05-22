@@ -83,7 +83,6 @@
             transition: all 0.2s;
         }
 
-        /* Grade de parcelas customizadas */
         .custom-matrix-panel {
             background: #fdfdff;
             border: 1px dashed var(--appmax-purple);
@@ -151,7 +150,7 @@
     </div>
 
     <h1>Configurador de Política de Taxas</h1>
-    <div class="subtitle">Controle completo de taxas lineares ou tabelas personalizadas por mês.</div>
+    <div class="subtitle">Ajuste de margens com suporte a tabelas customizadas e regras flexíveis de saque.</div>
     
     <div class="settings-panel">
         <div class="input-group">
@@ -203,7 +202,14 @@
             <input type="number" id="taxaAnte" value="1.49" step="0.01">
         </div>
         <div class="input-group">
-            <label>Taxa de Saque (R$)</label>
+            <label>Configuração de Saque</label>
+            <select id="statusSaque">
+                <option value="cobrar">Cobrar Taxa Fixa</option>
+                <option value="isento">Não contém / Isento</option>
+            </select>
+        </div>
+        <div class="input-group" id="groupValorSaque">
+            <label>Valor da Taxa de Saque (R$)</label>
             <input type="number" id="taxaSaque" value="3.67" step="0.01">
         </div>
     </div>
@@ -238,10 +244,10 @@
         </div>
 
         <div class="rules-summary">
-            <span>Cobrança Cliente: <span id="lCheckout">R$ 0,00</span></span>
+            <span>Cobrança Checkout: <span id="lCheckout">R$ 0,00</span></span>
             <span>Nº Parcelas: <span id="lParcelas">0</span>x</span>
-            <span>Taxa de Juros Alvo: <span id="lJurosTxt">0%</span></span>
-            <span>Política: <span id="lPoliticaTxt">-</span></span>
+            <span>Juros Globais: <span id="lJurosTxt">0%</span></span>
+            <span>Tarifa Saque: <span id="lSaqueTxt">R$ 0,00</span></span>
         </div>
 
         <div class="table-section">
@@ -290,7 +296,7 @@
                         <td class="text-right" id="vAnteAnt">- R$ 0,00</td>
                     </tr>
                     <tr>
-                        <td>Tarifa Fixa de Saque</td>
+                        <td>Tarifa de Saque / Transferência</td>
                         <td class="text-right" id="vSaque30">- R$ 0,00</td>
                         <td class="text-right" id="vSaqueAnt">- R$ 0,00</td>
                     </tr>
@@ -310,11 +316,10 @@
 </div>
 
 <script>
-    const baseFields = ['vendaBruta', 'numParcelas', 'modeloCalculo', 'taxaParc', 'repassarJuros', 'limiteAbsorcao', 'taxaProc', 'taxaGate', 'taxaGar', 'taxaAnte', 'taxaSaque'];
+    const baseFields = ['vendaBruta', 'numParcelas', 'modeloCalculo', 'taxaParc', 'repassarJuros', 'limiteAbsorcao', 'taxaProc', 'taxaGate', 'taxaGar', 'taxaAnte', 'statusSaque', 'taxaSaque'];
     
     function format(v) { return v.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }); }
 
-    // Controla a visibilidade condicional dos painéis baseada nas seleções
     document.getElementById('modeloCalculo').addEventListener('change', function() {
         const isCustom = this.value === 'custom';
         document.getElementById('matrixPanel').style.display = isCustom ? 'block' : 'none';
@@ -327,7 +332,12 @@
         update();
     });
 
-    // Adiciona escuta para todos os inputs da matriz manual
+    // Controla visibilidade do input de valor do saque
+    document.getElementById('statusSaque').addEventListener('change', function() {
+        document.getElementById('groupValorSaque').style.display = (this.value === 'cobrar') ? 'flex' : 'none';
+        update();
+    });
+
     for(let i=1; i<=12; i++) {
         document.getElementById(`m${i}`).addEventListener('input', update);
     }
@@ -339,7 +349,9 @@
             val[f] = el.type === 'number' ? (parseFloat(el.value) || 0) : el.value;
         });
 
-        // 1. Identificar a taxa de juros da parcela selecionada
+        // Forçar saque = 0 se estiver configurado como isento
+        const valorSaqueFinal = val.statusSaque === 'isento' ? 0 : val.taxaSaque;
+
         let jurosTotalPedido = 0;
         let pAlvo = Math.min(12, Math.max(1, val.numParcelas));
 
@@ -351,7 +363,6 @@
             jurosTotalPedido = pAlvo > 1 ? val.taxaParc : 0;
         }
 
-        // 2. Separar quanto vai ser repassado vs quanto vai ser absorvido
         let taxaJuroCliente = 0;
         let taxaJuroAbsorvida = 0;
 
@@ -362,28 +373,23 @@
             taxaJuroCliente = 0;
             taxaJuroAbsorvida = jurosTotalPedido;
         } else if (val.repassarJuros === 'parcial') {
-            // Se o cliente dividiu em mais vezes do que o limite estipulado de absorção
             if (pAlvo > val.limiteAbsorcao) {
                 if (val.modeloCalculo === 'custom') {
-                    // Pega a taxa limite de absorção e joga o resto pro cliente
                     taxaJuroAbsorvida = parseFloat(document.getElementById(`m${val.limiteAbsorcao}`).value) || 0;
                     taxaJuroCliente = Math.max(0, jurosTotalPedido - taxaJuroAbsorvida);
                 } else if (val.modeloCalculo === 'auto_mensal') {
                     taxaJuroAbsorvida = val.taxaParc * val.limiteAbsorcao;
                     taxaJuroCliente = val.taxaParc * (pAlvo - val.limiteAbsorcao);
                 } else {
-                    // No fixo não há quebra mensal linear, divide-se pelas parcelas
                     taxaJuroAbsorvida = (jurosTotalPedido / pAlvo) * val.limiteAbsorcao;
                     taxaJuroCliente = jurosTotalPedido - taxaJuroAbsorvida;
                 }
             } else {
-                // Se está dentro do limite, o lojista absorve o juro completo daquela parcela
                 taxaJuroCliente = 0;
                 taxaJuroAbsorvida = jurosTotalPedido;
             }
         }
 
-        // 3. Execução dos cálculos financeiros em cascata
         const valorCheckout = val.vendaBruta * (1 + (taxaJuroCliente / 100));
         const dProc = valorCheckout * (val.taxaProc / 100);
         const dParcAbsorvido = val.vendaBruta * (taxaJuroAbsorvida / 100);
@@ -393,15 +399,13 @@
         const saldoSobra = liqAppmax - dGar;
         const dAnte = saldoSobra * (val.taxaAnte / 100);
 
-        const res30 = saldoSobra - val.taxaSaque;
-        const resAnt = saldoSobra - dAnte - val.taxaSaque;
+        const res30 = saldoSobra - valorSaqueFinal;
+        const resAnt = saldoSobra - dAnte - valorSaqueFinal;
 
-        // 4. Renderização de dados na interface/PDF
         document.getElementById('lCheckout').innerText = format(valorCheckout);
         document.getElementById('lParcelas').innerText = pAlvo;
         document.getElementById('lJurosTxt').innerText = jurosTotalPedido.toFixed(2) + '%';
-        document.getElementById('lPoliticaTxt').innerText = 
-            val.repassarJuros === 'sim' ? 'Repasse Total' : (val.repassarJuros === 'nao' ? 'Absorção Total' : `Absorve até ${val.limiteAbsorcao}x`);
+        document.getElementById('lSaqueTxt').innerText = valorSaqueFinal === 0 ? 'Isento' : format(valorSaqueFinal);
 
         document.getElementById('vBruto30').innerText = format(valorCheckout);
         document.getElementById('vBrutoAnt').innerText = format(valorCheckout);
@@ -417,8 +421,8 @@
         document.getElementById('vGarAnt').innerText = '- ' + format(dGar);
         document.getElementById('vAnteAnt').innerText = '- ' + format(dAnte);
         document.getElementById('vAnte30').innerText = format(0);
-        document.getElementById('vSaque30').innerText = '- ' + format(val.taxaSaque);
-        document.getElementById('vSaqueAnt').innerText = '- ' + format(val.taxaSaque);
+        document.getElementById('vSaque30').innerText = '- ' + format(valorSaqueFinal);
+        document.getElementById('vSaqueAnt').innerText = '- ' + format(valorSaqueFinal);
         
         document.getElementById('vFinal30').innerText = format(res30);
         document.getElementById('vFinalAnt').innerText = format(resAnt);
