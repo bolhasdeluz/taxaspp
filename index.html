@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Simulador Avançado de Precificação | Appmax</title>
+    <title>Simulador de Precificação Customizada | Appmax</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <style>
@@ -29,7 +29,7 @@
 
         .container {
             width: 100%;
-            max-width: 1000px;
+            max-width: 1050px;
             background: #ffffff;
             padding: 40px;
             border-radius: 16px;
@@ -56,7 +56,7 @@
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
             gap: 20px;
-            margin-bottom: 30px;
+            margin-bottom: 25px;
             padding: 25px;
             background: #faf9ff;
             border-radius: 12px;
@@ -82,11 +82,24 @@
             background: white;
             transition: all 0.2s;
         }
-        .input-group input:focus, .input-group select:focus {
-            outline: none;
-            border-color: var(--appmax-purple);
-            box-shadow: 0 0 0 3px rgba(148, 102, 255, 0.15);
+
+        /* Grade de parcelas customizadas */
+        .custom-matrix-panel {
+            background: #fdfdff;
+            border: 1px dashed var(--appmax-purple);
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 30px;
         }
+        .matrix-title { font-size: 12px; font-weight: 700; color: var(--appmax-purple); margin-bottom: 15px; text-transform: uppercase; }
+        .matrix-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+            gap: 12px;
+        }
+        .matrix-input { display: flex; flex-direction: column; }
+        .matrix-input label { font-size: 11px; font-weight: 600; margin-bottom: 4px; color: var(--text-muted); }
+        .matrix-input input { padding: 8px 10px; border: 1px solid var(--border-color); border-radius: 6px; font-size: 13px; text-align: center; }
 
         .btn-generate {
             background: var(--appmax-purple);
@@ -99,13 +112,12 @@
             cursor: pointer;
             width: 100%;
             margin-bottom: 40px;
-            transition: background 0.2s;
         }
         .btn-generate:hover { background: #7f4dff; }
 
         #pdf-report { padding: 0; background: white; border-radius: 12px; overflow: hidden; border: 1px solid var(--border-color); }
         .report-header { background-color: var(--appmax-purple); color: white; padding: 35px 30px; display: flex; justify-content: space-between; align-items: center; }
-        .report-header-info h2 { margin: 0; font-size: 22px; font-weight: 700; letter-spacing: -0.5px; }
+        .report-header-info h2 { margin: 0; font-size: 22px; font-weight: 700; }
         .report-header-info p { margin: 6px 0 0 0; font-size: 13px; opacity: 0.85; }
 
         .rules-summary {
@@ -139,7 +151,7 @@
     </div>
 
     <h1>Configurador de Política de Taxas</h1>
-    <div class="subtitle">Ajuste as regras de repasse, parcelamento e absorção limite para simular a margem real.</div>
+    <div class="subtitle">Controle completo de taxas lineares ou tabelas personalizadas por mês.</div>
     
     <div class="settings-panel">
         <div class="input-group">
@@ -147,19 +159,20 @@
             <input type="number" id="vendaBruta" value="1000.00" step="0.01">
         </div>
         <div class="input-group">
-            <label>Nº de Parcelas do Pedido</label>
+            <label>Nº de Parcelas Selecionado</label>
             <input type="number" id="numParcelas" value="6" min="1" max="12">
         </div>
         <div class="input-group">
-            <label>Taxa de Parcelamento (%)</label>
-            <input type="number" id="taxaParc" value="2.49" step="0.01">
-        </div>
-        <div class="input-group">
-            <label>Tipo de Cálculo (Parcelam.)</label>
-            <select id="tipoParc">
-                <option value="fixo">Taxa Fixa (Independe de parcelas)</option>
-                <option value="mensal" selected>Taxa ao Mês (Acumulativa)</option>
+            <label>Modelo das Parcelas</label>
+            <select id="modeloCalculo">
+                <option value="auto_mensal">Automático: Multiplicar ao Mês</option>
+                <option value="auto_fixo">Automático: Taxa Fixa</option>
+                <option value="custom">Personalizado: Tabela Mês a Mês</option>
             </select>
+        </div>
+        <div class="input-group" id="groupTaxaLinear">
+            <label>Taxa de Parcelamento Base (%)</label>
+            <input type="number" id="taxaParc" value="2.49" step="0.01">
         </div>
         <div class="input-group">
             <label>Repassar Juros Pro Cliente?</label>
@@ -195,13 +208,31 @@
         </div>
     </div>
 
+    <div class="custom-matrix-panel" id="matrixPanel" style="display: none;">
+        <div class="matrix-title">Tabela de Parcelamento Customizada (Defina a Taxa Final Acumulada para cada Mês)</div>
+        <div class="matrix-grid">
+            <div class="matrix-input"><label>1x (%)</label><input type="number" id="m1" value="0.00" step="0.01"></div>
+            <div class="matrix-input"><label>2x (%)</label><input type="number" id="m2" value="3.50" step="0.01"></div>
+            <div class="matrix-input"><label>3x (%)</label><input type="number" id="m3" value="5.20" step="0.01"></div>
+            <div class="matrix-input"><label>4x (%)</label><input type="number" id="m4" value="7.00" step="0.01"></div>
+            <div class="matrix-input"><label>5x (%)</label><input type="number" id="m5" value="8.90" step="0.01"></div>
+            <div class="matrix-input"><label>6x (%)</label><input type="number" id="m6" value="10.50" step="0.01"></div>
+            <div class="matrix-input"><label>7x (%)</label><input type="number" id="m7" value="12.20" step="0.01"></div>
+            <div class="matrix-input"><label>8x (%)</label><input type="number" id="m8" value="14.00" step="0.01"></div>
+            <div class="matrix-input"><label>9x (%)</label><input type="number" id="m9" value="15.80" step="0.01"></div>
+            <div class="matrix-input"><label>10x (%)</label><input type="number" id="m10" value="17.50" step="0.01"></div>
+            <div class="matrix-input"><label>11x (%)</label><input type="number" id="m11" value="19.20" step="0.01"></div>
+            <div class="matrix-input"><label>12x (%)</label><input type="number" id="m12" value="21.00" step="0.01"></div>
+        </div>
+    </div>
+
     <button class="btn-generate" onclick="gerarPDF()">Gerar Relatório de Precificação (PDF)</button>
 
     <div id="pdf-report">
         <div class="report-header">
             <div class="report-header-info">
                 <h2>Análise Estratégica de Margem</h2>
-                <p>Simulação com base na política de repasse e absorção de juros</p>
+                <p>Simulação com base na política de repasse e juros parametrizados</p>
             </div>
             <div class="appmax-logo-text" style="color: white; font-size: 20px;"><span>app</span>max</div>
         </div>
@@ -209,7 +240,7 @@
         <div class="rules-summary">
             <span>Cobrança Cliente: <span id="lCheckout">R$ 0,00</span></span>
             <span>Nº Parcelas: <span id="lParcelas">0</span>x</span>
-            <span>Juros Cobrados: <span id="lJurosTxt">0%</span></span>
+            <span>Taxa de Juros Alvo: <span id="lJurosTxt">0%</span></span>
             <span>Política: <span id="lPoliticaTxt">-</span></span>
         </div>
 
@@ -234,7 +265,7 @@
                         <td class="text-right" id="vProcAnt">- R$ 0,00</td>
                     </tr>
                     <tr>
-                        <td>Taxa Fixo de Gateway / Antifraude</td>
+                        <td>Taxa Fixa de Gateway / Antifraude</td>
                         <td class="text-right" id="vGate30">- R$ 0,00</td>
                         <td class="text-right" id="vGateAnt">- R$ 0,00</td>
                     </tr>
@@ -249,7 +280,7 @@
                         <td class="text-right" id="vLiqAnt">R$ 0,00</td>
                     </tr>
                     <tr>
-                        <td>Retenção de Garantia (15% sobre o Total Bruto)</td>
+                        <td>Retenção de Garantia (15% sobre o Checkout)</td>
                         <td class="text-right" id="vGar30">- R$ 0,00</td>
                         <td class="text-right" id="vGarAnt">- R$ 0,00</td>
                     </tr>
@@ -279,59 +310,85 @@
 </div>
 
 <script>
-    const fields = ['vendaBruta', 'numParcelas', 'taxaParc', 'tipoParc', 'repassarJuros', 'limiteAbsorcao', 'taxaProc', 'taxaGate', 'taxaGar', 'taxaAnte', 'taxaSaque'];
+    const baseFields = ['vendaBruta', 'numParcelas', 'modeloCalculo', 'taxaParc', 'repassarJuros', 'limiteAbsorcao', 'taxaProc', 'taxaGate', 'taxaGar', 'taxaAnte', 'taxaSaque'];
     
     function format(v) { return v.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }); }
 
-    // Controla exibição do campo de limite de absorção parcial
+    // Controla a visibilidade condicional dos painéis baseada nas seleções
+    document.getElementById('modeloCalculo').addEventListener('change', function() {
+        const isCustom = this.value === 'custom';
+        document.getElementById('matrixPanel').style.display = isCustom ? 'block' : 'none';
+        document.getElementById('groupTaxaLinear').style.display = isCustom ? 'none' : 'flex';
+        update();
+    });
+
     document.getElementById('repassarJuros').addEventListener('change', function() {
         document.getElementById('groupAbsorcao').style.display = (this.value === 'parcial') ? 'flex' : 'none';
+        update();
     });
+
+    // Adiciona escuta para todos os inputs da matriz manual
+    for(let i=1; i<=12; i++) {
+        document.getElementById(`m${i}`).addEventListener('input', update);
+    }
 
     function update() {
         const val = {};
-        fields.forEach(f => {
+        baseFields.forEach(f => {
             const el = document.getElementById(f);
             val[f] = el.type === 'number' ? (parseFloat(el.value) || 0) : el.value;
         });
 
-        // 1. Descobrir a taxa total de juros/parcelamento com base no cenário
-        let taxaJurosTotal = 0;
-        if (val.numParcelas > 1) {
-            taxaJurosTotal = val.tipoParc === 'mensal' ? (val.taxaParc * val.numParcelas) : val.taxaParc;
+        // 1. Identificar a taxa de juros da parcela selecionada
+        let jurosTotalPedido = 0;
+        let pAlvo = Math.min(12, Math.max(1, val.numParcelas));
+
+        if (val.modeloCalculo === 'custom') {
+            jurosTotalPedido = parseFloat(document.getElementById(`m${pAlvo}`).value) || 0;
+        } else if (val.modeloCalculo === 'auto_mensal') {
+            jurosTotalPedido = pAlvo > 1 ? (val.taxaParc * pAlvo) : 0;
+        } else {
+            jurosTotalPedido = pAlvo > 1 ? val.taxaParc : 0;
         }
 
-        // 2. Calcular quanto de juro vai pro cliente e quanto fica com o lojista
+        // 2. Separar quanto vai ser repassado vs quanto vai ser absorvido
         let taxaJuroCliente = 0;
         let taxaJuroAbsorvida = 0;
 
         if (val.repassarJuros === 'sim') {
-            taxuroCliente = taxaJurosTotal;
+            taxaJuroCliente = jurosTotalPedido;
             taxaJuroAbsorvida = 0;
         } else if (val.repassarJuros === 'nao') {
             taxaJuroCliente = 0;
-            taxaJurosAbsorvida = taxaJurosTotal;
+            taxaJuroAbsorvida = jurosTotalPedido;
         } else if (val.repassarJuros === 'parcial') {
-            // Ex: Comprou em 6x, absorve até a 3ª. O cliente paga as 3 restantes.
-            const parcelasCobrar = Math.max(0, val.numParcelas - val.limiteAbsorcao);
-            if (val.tipoParc === 'mensal') {
-                taxaJuroCliente = val.taxaParc * parcelasCobrar;
-                taxaJuroAbsorvida = val.taxaParc * Math.min(val.numParcelas, val.limiteAbsorcao);
+            // Se o cliente dividiu em mais vezes do que o limite estipulado de absorção
+            if (pAlvo > val.limiteAbsorcao) {
+                if (val.modeloCalculo === 'custom') {
+                    // Pega a taxa limite de absorção e joga o resto pro cliente
+                    taxaJuroAbsorvida = parseFloat(document.getElementById(`m${val.limiteAbsorcao}`).value) || 0;
+                    taxaJuroCliente = Math.max(0, jurosTotalPedido - taxaJuroAbsorvida);
+                } else if (val.modeloCalculo === 'auto_mensal') {
+                    taxaJuroAbsorvida = val.taxaParc * val.limiteAbsorcao;
+                    taxaJuroCliente = val.taxaParc * (pAlvo - val.limiteAbsorcao);
+                } else {
+                    // No fixo não há quebra mensal linear, divide-se pelas parcelas
+                    taxaJuroAbsorvida = (jurosTotalPedido / pAlvo) * val.limiteAbsorcao;
+                    taxaJuroCliente = jurosTotalPedido - taxaJuroAbsorvida;
+                }
             } else {
-                // Se for juro fixo, divide proporcionalmente pelas parcelas
-                taxaJuroCliente = (taxaJurosTotal / val.numParcelas) * parcelasCobrar;
-                taxaJuroAbsorvida = taxaJurosTotal - taxaJuroCliente;
+                // Se está dentro do limite, o lojista absorve o juro completo daquela parcela
+                taxaJuroCliente = 0;
+                taxaJuroAbsorvida = jurosTotalPedido;
             }
         }
 
-        // 3. Definir o valor final de cobrança no checkout
+        // 3. Execução dos cálculos financeiros em cascata
         const valorCheckout = val.vendaBruta * (1 + (taxaJuroCliente / 100));
-
-        // 4. Rodar a cascata de descontos do Gateway sobre o valor do checkout
         const dProc = valorCheckout * (val.taxaProc / 100);
         const dParcAbsorvido = val.vendaBruta * (taxaJuroAbsorvida / 100);
-        const liqAppmax = valorCheckout - dProc - val.taxaGate - dParcAbsorvido;
         
+        const liqAppmax = valorCheckout - dProc - val.taxaGate - dParcAbsorvido;
         const dGar = valorCheckout * (val.taxaGar / 100);
         const saldoSobra = liqAppmax - dGar;
         const dAnte = saldoSobra * (val.taxaAnte / 100);
@@ -339,45 +396,36 @@
         const res30 = saldoSobra - val.taxaSaque;
         const resAnt = saldoSobra - dAnte - val.taxaSaque;
 
-        // Atualizar os labels do relatório
+        // 4. Renderização de dados na interface/PDF
         document.getElementById('lCheckout').innerText = format(valorCheckout);
-        document.getElementById('lParcelas').innerText = val.numParcelas;
-        document.getElementById('lJurosTxt').innerText = taxaJurosTotal.toFixed(2) + '%';
+        document.getElementById('lParcelas').innerText = pAlvo;
+        document.getElementById('lJurosTxt').innerText = jurosTotalPedido.toFixed(2) + '%';
         document.getElementById('lPoliticaTxt').innerText = 
-            val.repassarJuros === 'sim' ? 'Repasse Total' : (val.repassarJuros === 'nao' ? 'Absorção Total' : `Absorve até ${val.limiteAbsorcao}ª`);
+            val.repassarJuros === 'sim' ? 'Repasse Total' : (val.repassarJuros === 'nao' ? 'Absorção Total' : `Absorve até ${val.limiteAbsorcao}x`);
 
-        // Preencher a tabela de resultados
         document.getElementById('vBruto30').innerText = format(valorCheckout);
         document.getElementById('vBrutoAnt').innerText = format(valorCheckout);
-        
         document.getElementById('vProc30').innerText = '- ' + format(dProc);
         document.getElementById('vProcAnt').innerText = '- ' + format(dProc);
-        
         document.getElementById('vGate30').innerText = '- ' + format(val.taxaGate);
         document.getElementById('vGateAnt').innerText = '- ' + format(val.taxaGate);
-
         document.getElementById('vParc30').innerText = '- ' + format(dParcAbsorvido);
         document.getElementById('vParcAnt').innerText = '- ' + format(dParcAbsorvido);
-        
         document.getElementById('vLiq30').innerText = format(liqAppmax);
         document.getElementById('vLiqAnt').innerText = format(liqAppmax);
-        
         document.getElementById('vGar30').innerText = '- ' + format(dGar);
         document.getElementById('vGarAnt').innerText = '- ' + format(dGar);
-        
         document.getElementById('vAnteAnt').innerText = '- ' + format(dAnte);
         document.getElementById('vAnte30').innerText = format(0);
-        
         document.getElementById('vSaque30').innerText = '- ' + format(val.taxaSaque);
         document.getElementById('vSaqueAnt').innerText = '- ' + format(val.taxaSaque);
         
         document.getElementById('vFinal30').innerText = format(res30);
         document.getElementById('vFinalAnt').innerText = format(resAnt);
-        
         document.getElementById('vDiferenca').innerText = format(res30 - resAnt);
     }
 
-    fields.forEach(f => document.getElementById(f).addEventListener('input', update));
+    baseFields.forEach(f => document.getElementById(f).addEventListener('input', update));
     update();
 
     function gerarPDF() {
